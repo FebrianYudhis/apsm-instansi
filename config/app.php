@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'APSM'),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,6 +54,13 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'pencipta_arsip' => env(
+        'APP_PENCIPTA_ARSIP',
+        'Stasiun Meteorologi Kelas IV H. Asan Kotawaringin Timur'
+    ),
+
+    'start_year' => (int) env('START_YEAR', 2025),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -65,7 +72,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
@@ -114,7 +121,7 @@ return [
     | manage Laravel's "maintenance mode" status. The "cache" driver will
     | allow maintenance mode to be controlled across multiple machines.
     |
-    | Supported drivers: "file", "cache"
+    | Supported drivers: "file", "cache", "array"
     |
     */
 

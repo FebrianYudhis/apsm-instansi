@@ -1,58 +1,233 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# APSM Instansi
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+APSM (Aplikasi Pengelolaan Surat Menyurat) adalah aplikasi web untuk mengelola surat masuk, surat keluar, dokumen digital, klasifikasi, berkas arsip, dan proses alih media. Aplikasi menyediakan ruang kerja internal berdasarkan tahun serta portal publik untuk menelusuri arsip yang dapat diakses masyarakat.
 
-## About Laravel
+Versi saat ini: **0.1.0**. Catatan rilis tersedia di [CHANGELOG.md](CHANGELOG.md).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Pengelolaan surat masuk, surat keluar, dokumen digital, klasifikasi, dan berkas.
+- Pemberkasan surat, perpindahan status arsip, retensi, dan perpindahan tahun kerja.
+- Dukungan surat SRIKANDI dan nomor agenda unik per tahun.
+- Portal arsip publik dengan pencarian, pagination, dan pembatasan atribut hasil.
+- Dokumen private dengan akses admin, akses publik, atau signed URL setelah verifikasi MFA.
+- Alih media PDF melalui queue dengan watermark, retry, dan status proses terstruktur.
+- Ekspor Excel untuk klasifikasi, pencatatan surat, daftar berkas, dan alih media.
+- Activity log untuk autentikasi, mutasi arsip, dan ekspor.
+- Audit integritas read-only untuk data serta file arsip production.
+- Validasi PDF berdasarkan isi dan ukuran, rate limiting, serta perlindungan formula injection pada spreadsheet.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Teknologi
 
-## Learning Laravel
+- PHP 8.3 atau lebih baru
+- Laravel 13
+- MySQL/MariaDB untuk penggunaan utama; SQLite didukung untuk pengujian
+- Laravel database queue
+- Vite 8, Tailwind CSS 4, Bootstrap 4, dan jQuery
+- Pest 4
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Ekstensi PHP penting mencakup `fileinfo`, `gd`, `dom`, `simplexml`, `xml`, `xmlreader`, `xmlwriter`, dan `zip`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Persyaratan lokal:
 
-## Agentic Development
+- PHP dan Composer
+- Node.js dan npm
+- MySQL atau MariaDB
+- Ekstensi PHP yang dibutuhkan Composer
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Clone repository, lalu jalankan setup otomatis:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer run setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Script tersebut memasang dependency PHP dan JavaScript, membuat `.env`, menghasilkan `APP_KEY`, menjalankan migration, dan membangun aset frontend.
 
-## Contributing
+Sesuaikan koneksi database dan konfigurasi aplikasi di `.env`, kemudian isi data referensi:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan db:seed
+```
 
-## Code of Conduct
+Jalankan aplikasi untuk development:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer run dev
+```
 
-## Security Vulnerabilities
+Perintah tersebut menjalankan server Laravel, queue listener, dan Vite secara bersamaan.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Setup Manual
 
-## License
+Gunakan langkah berikut bila tidak memakai `composer run setup`:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+npm install
+php artisan migrate --force
+php artisan db:seed
+npm run build
+```
+
+Pada Windows PowerShell, gunakan `Copy-Item .env.example .env` sebagai pengganti `cp`.
+
+## Konfigurasi
+
+Nilai berikut perlu diperiksa sebelum aplikasi digunakan:
+
+```dotenv
+APP_NAME=APSM
+APP_URL=http://localhost:8000
+APP_PENCIPTA_ARSIP="Nama Instansi"
+START_YEAR=2025
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=apsm-instansi
+DB_USERNAME=root
+DB_PASSWORD=
+
+QUEUE_CONNECTION=database
+DB_QUEUE_RETRY_AFTER=960
+
+DOCUMENT_MAX_UPLOAD_KB=102400
+DOCUMENT_GUEST_LINK_MINUTES=2
+MFA_SECRET=
+```
+
+Keterangan:
+
+- `APP_PENCIPTA_ARSIP` digunakan pada dokumen ekspor.
+- `START_YEAR` menentukan tahun kerja paling awal yang dapat dipilih.
+- `DOCUMENT_MAX_UPLOAD_KB` menentukan batas upload PDF dalam kilobyte.
+- `DOCUMENT_GUEST_LINK_MINUTES` menentukan masa berlaku signed URL dokumen terbatas.
+- `MFA_SECRET` wajib diisi untuk akses dokumen terbatas dan tindakan yang dilindungi MFA.
+- `QUEUE_CONNECTION` harus menggunakan `database` agar proses watermark berjalan sesuai konfigurasi aplikasi.
+
+Gunakan secret MFA Base32 yang kuat dan unik. Jangan commit `.env` atau nilai secret ke repository.
+
+## Penyimpanan Dokumen
+
+Dokumen arsip disimpan melalui disk `documents` pada storage private. File tidak boleh dipindahkan ke `public/` atau disajikan langsung melalui symbolic link. Semua akses dokumen harus melewati route dan `DocumentService` agar pemeriksaan hak akses, path, signed URL, dan versi watermark tetap berlaku.
+
+Pastikan proses web dan queue worker memiliki izin baca/tulis ke:
+
+```text
+storage/app/private
+storage/framework
+bootstrap/cache
+```
+
+## Akun Awal
+
+`php artisan db:seed` membuat data referensi dan akun development berikut:
+
+```text
+Username: admin
+Password: admin123
+```
+
+Ganti password akun tersebut segera setelah deployment. Seeder tidak akan mereset akun admin yang sudah ada.
+
+## Queue Alih Media
+
+Watermark PDF diproses secara asynchronous. Jalankan worker khusus aplikasi:
+
+```bash
+php artisan alih-media:queue
+```
+
+Opsi yang tersedia:
+
+```bash
+php artisan alih-media:queue --once
+php artisan alih-media:queue --stop-when-empty
+```
+
+Untuk production, jalankan command worker sebagai service yang dipantau Supervisor, systemd, atau process manager setara. Worker menggunakan timeout 900 detik dan satu percobaan per job; kegagalan dicatat dan status berkas dipulihkan oleh job.
+
+## Command Operasional
+
+Audit integritas database dan file arsip tanpa mengubah data:
+
+```bash
+php artisan audit:integritas-production
+php artisan audit:integritas-production --year=2026
+php artisan audit:integritas-production --format=json
+php artisan audit:integritas-production --no-orphans
+```
+
+Command menghasilkan exit code gagal bila menemukan masalah integritas, sehingga dapat digunakan pada monitoring atau CI terjadwal.
+
+Hapus activity log yang berumur lebih dari 12 bulan:
+
+```bash
+php artisan activitylog:clean
+```
+
+## Pengujian
+
+Suite pengujian menggunakan SQLite in-memory sehingga tidak menyentuh database development:
+
+```bash
+php artisan test --compact
+```
+
+Jalankan formatter PHP setelah mengubah kode:
+
+```bash
+vendor/bin/pint --format agent
+```
+
+Build aset production:
+
+```bash
+npm run build
+```
+
+## Deployment
+
+Minimal langkah deployment:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm install --ignore-scripts
+npm run build
+php artisan migrate --force
+php artisan db:seed --force
+php artisan optimize
+```
+
+Setelah itu:
+
+1. Pastikan `APP_ENV=production`, `APP_DEBUG=false`, dan `APP_URL` sesuai domain HTTPS.
+2. Ganti kredensial admin awal dan gunakan `MFA_SECRET` production.
+3. Berikan izin storage kepada user proses web dan queue.
+4. Jalankan `php artisan alih-media:queue` sebagai service persisten.
+5. Jadwalkan `php artisan activitylog:clean` sesuai kebijakan operasional.
+6. Jalankan `php artisan audit:integritas-production` setelah deployment dan secara berkala.
+
+Jangan menjalankan `storage:link` untuk mengekspos dokumen arsip. Disk public hanya untuk aset yang memang ditujukan bagi publik.
+
+## Struktur Modul
+
+```text
+app/Console/Commands   Command operasional dan audit
+app/Http/Controllers  Alur web, dokumen, ekspor, dan autentikasi
+app/Jobs              Pemrosesan watermark asynchronous
+app/Models            Model domain arsip
+app/Services          Dokumen, filter, locking, audit, dan spreadsheet
+database/migrations   Skema database terurut
+database/seeders      Data referensi dan akun awal
+resources/views       Antarmuka internal dan portal publik
+tests/Feature         Pengujian alur, keamanan, ekspor, dan integritas
+```
+
+## Lisensi
+
+Proyek menggunakan lisensi MIT sebagaimana dinyatakan pada `composer.json`.
