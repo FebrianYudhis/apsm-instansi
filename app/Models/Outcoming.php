@@ -13,7 +13,19 @@ class Outcoming extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'tanggal_surat',
+        'nomor_surat',
+        'tujuan',
+        'perihal',
+        'url',
+        'tahun',
+        'is_digital',
+        'is_srikandi',
+        'url_watermarked',
+        'access_id',
+        'filelist_id',
+    ];
 
     protected $casts = [
         'is_digital' => 'boolean',
@@ -23,7 +35,7 @@ class Outcoming extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logUnguarded()
+            ->logFillable()
             ->logOnlyDirty();
     }
 

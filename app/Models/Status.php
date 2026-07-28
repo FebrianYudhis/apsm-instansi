@@ -23,7 +23,9 @@ class Status extends Model
 
     public const PERMANENT = 'Permanen';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'nama_status',
+    ];
 
     public function filelists()
     {

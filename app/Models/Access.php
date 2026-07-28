@@ -9,7 +9,9 @@ class Access extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'sifat_akses',
+    ];
 
     public function incomings()
     {

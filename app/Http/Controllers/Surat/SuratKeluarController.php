@@ -8,40 +8,19 @@ use App\Models\Filelist;
 use App\Models\Outcoming;
 use App\Rules\ValidPdf;
 use App\Services\DocumentService;
-use App\Services\ExportActivityLogger;
 use App\Services\FilelistMutationLock;
-use App\Services\SafeSpreadsheetValueBinder;
 use App\Services\SuratFilterQuery;
-use Carbon\Carbon;
+use App\Services\SuratPencatatanExporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use RealRashid\SweetAlert\Facades\Alert;
-use Throwable;
 
 class SuratKeluarController extends Controller
 {
-    private function formatTanggalIndonesia($tanggal): string
-    {
-        if (empty($tanggal) || $tanggal === '-') {
-            return '-';
-        }
-
-        try {
-            return Carbon::parse($tanggal)->format('d-m-Y');
-        } catch (Throwable $th) {
-            return (string) $tanggal;
-        }
-    }
-
     public function tambah()
     {
         $data = [
@@ -342,139 +321,10 @@ class SuratKeluarController extends Controller
     public function exportPencatatanExcel(
         Request $request,
         SuratFilterQuery $suratFilter,
-        ExportActivityLogger $exportLogger
+        SuratPencatatanExporter $exporter
     ) {
         $filters = $suratFilter->validateOutgoing($request);
-        $jalurPengiriman = $filters['jalur_pengiriman'];
-        $tanggalDari = $filters['tanggal_dari'];
-        $tanggalSampai = $filters['tanggal_sampai'];
 
-        $suratKeluar = $suratFilter
-            ->outgoing((int) Auth::user()->tahun, $filters)
-            ->with('access')
-            ->orderBy('tanggal_surat', 'asc')
-            ->orderBy('nomor_surat', 'asc')
-            ->get();
-
-        $jalurLabels = [
-            'semua' => 'Semua',
-            'srikandi' => 'SRIKANDI',
-            'non_srikandi' => 'Tanpa SRIKANDI',
-        ];
-        $periode = 'Semua tanggal';
-        if ($tanggalDari && $tanggalSampai) {
-            $periode = $this->formatTanggalIndonesia($tanggalDari)
-                .' s.d. '
-                .$this->formatTanggalIndonesia($tanggalSampai);
-        } elseif ($tanggalDari) {
-            $periode = 'Mulai '.$this->formatTanggalIndonesia($tanggalDari);
-        } elseif ($tanggalSampai) {
-            $periode = 'Sampai '.$this->formatTanggalIndonesia($tanggalSampai);
-        }
-
-        $spreadsheet = new Spreadsheet;
-        $spreadsheet->setValueBinder(new SafeSpreadsheetValueBinder);
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Pencatatan Naskah Keluar');
-        $sheet->setCellValue('A1', 'Agenda Elektronik Pencatatan Naskah Dinas Keluar');
-        $sheet->mergeCells('A1:F1');
-        $sheet->setCellValue('A2', config('app.pencipta_arsip'));
-        $sheet->mergeCells('A2:F2');
-        $sheet->setCellValue('A3', 'Tahun '.Auth::user()->tahun);
-        $sheet->mergeCells('A3:F3');
-        $sheet->setCellValue(
-            'A4',
-            'Jalur Pengiriman: '.$jalurLabels[$jalurPengiriman]
-        );
-        $sheet->mergeCells('A4:F4');
-        $sheet->setCellValue('A5', 'Periode Tanggal Surat: '.$periode);
-        $sheet->mergeCells('A5:F5');
-
-        $headers = [
-            'A' => 'Tanggal Surat',
-            'B' => 'Jalur Pengiriman',
-            'C' => 'Nomor Surat',
-            'D' => 'Tujuan',
-            'E' => 'Perihal',
-            'F' => 'SKKAAD',
-        ];
-
-        $headerRow = 7;
-        foreach ($headers as $column => $title) {
-            $sheet->setCellValue($column.$headerRow, $title);
-        }
-
-        $row = $headerRow + 1;
-        foreach ($suratKeluar as $surat) {
-            $sheet->setCellValue('A'.$row, $this->formatTanggalIndonesia($surat->tanggal_surat));
-            $sheet->setCellValue('B'.$row, $surat->is_srikandi ? 'SRIKANDI' : 'Tanpa SRIKANDI');
-            $sheet->setCellValue('C'.$row, (string) ($surat->nomor_surat ?? '-'));
-            $sheet->setCellValue('D'.$row, (string) ($surat->tujuan ?? '-'));
-            $sheet->setCellValue('E'.$row, (string) ($surat->perihal ?? '-'));
-            $sheet->setCellValue('F'.$row, (string) (optional($surat->access)->sifat_akses ?? '-'));
-            $row++;
-        }
-
-        $lastRow = max($headerRow, $row - 1);
-
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(36);
-        $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(26);
-        $sheet->getStyle('A3')->getFont()->setBold(true)->setSize(20);
-        $sheet->getStyle('A1:A5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A'.$headerRow.':F'.$headerRow)->applyFromArray([
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '1F4E78'],
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
-            ],
-        ]);
-
-        $sheet->getStyle('A'.$headerRow.':F'.$lastRow)->applyFromArray([
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['rgb' => '808080'],
-                ],
-            ],
-            'alignment' => [
-                'vertical' => Alignment::VERTICAL_TOP,
-                'wrapText' => true,
-            ],
-        ]);
-
-        foreach (array_keys($headers) as $column) {
-            $sheet->getColumnDimension($column)->setAutoSize(true);
-        }
-
-        $sheet->freezePane('A'.($headerRow + 1));
-        $sheet->setAutoFilter('A'.$headerRow.':F'.$headerRow);
-
-        $fileName = 'pencatatan-naskah-keluar-'
-            .$jalurPengiriman
-            .'-'
-            .now()->format('Ymd-His')
-            .'.xlsx';
-
-        $exportLogger->logPrepared(
-            'pencatatan_surat_keluar',
-            $suratKeluar->count(),
-            $fileName,
-            $filters,
-            ['cakupan' => 'tahun_aktif']
-        );
-
-        return response()->streamDownload(function () use ($spreadsheet) {
-            try {
-                (new Xlsx($spreadsheet))->save('php://output');
-            } finally {
-                $spreadsheet->disconnectWorksheets();
-            }
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
+        return $exporter->outgoing((int) Auth::user()->tahun, $filters);
     }
 }

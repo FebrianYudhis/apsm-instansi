@@ -12,7 +12,10 @@ class Classification extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'kode_klasifikasi',
+        'keterangan',
+    ];
 
     protected $hidden = [
         'active_unique_key',
@@ -21,7 +24,7 @@ class Classification extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logUnguarded()
+            ->logFillable()
             ->logOnlyDirty();
     }
 

@@ -20,12 +20,20 @@ class Filelist extends Model
 
     public const ALIH_MEDIA_CLOSED = 4;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'classification_id',
+        'nama_berkas',
+        'status_id',
+        'retensi_aktif',
+        'retensi_inaktif',
+        'keterangan_akhir',
+        'alih_media_status_id',
+    ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logUnguarded()
+            ->logFillable()
             ->logOnlyDirty();
     }
 

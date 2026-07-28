@@ -12,12 +12,15 @@ class Digital extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'perihal',
+        'url',
+    ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logUnguarded()
+            ->logFillable()
             ->logOnlyDirty();
     }
 }

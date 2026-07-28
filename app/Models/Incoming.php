@@ -13,7 +13,20 @@ class Incoming extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'nomor_agenda',
+        'tanggal_diterima',
+        'nomor_surat',
+        'pengirim',
+        'tanggal_surat',
+        'perihal',
+        'url',
+        'tahun',
+        'is_srikandi',
+        'url_watermarked',
+        'access_id',
+        'filelist_id',
+    ];
 
     protected $casts = [
         'is_srikandi' => 'boolean',
@@ -32,7 +45,7 @@ class Incoming extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logUnguarded()
+            ->logFillable()
             ->logOnlyDirty();
     }
 

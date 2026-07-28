@@ -5,8 +5,10 @@ use App\Http\Controllers\AlihMediaController;
 use App\Http\Controllers\AlihMediaExportController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BerkasContentController;
 use App\Http\Controllers\BerkasController;
 use App\Http\Controllers\BerkasExportController;
+use App\Http\Controllers\BerkasStatusController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\GuestController;
@@ -89,11 +91,11 @@ Route::middleware('auth')->group(function () {
     Route::post('surat/klasifikasi/edit/{id}', [KlasifikasiController::class, 'update']);
     Route::delete('surat/klasifikasi/hapus/{id}', [KlasifikasiController::class, 'hapus'])->name('klasifikasi.hapus');
 
-    Route::get('surat/berkas/buka/{id}', [BerkasController::class, 'buka'])->name('berkas.buka');
-    Route::get('surat/berkas/aktif/list', [BerkasController::class, 'daftarBerkasAktif'])->name('berkas.aktif.list');
-    Route::post('surat/berkas/keluarkan/{idBerkas}/{jenis}/{idSurat}', [BerkasController::class, 'keluarkan'])->name('berkas.keluarkan');
-    Route::post('surat/berkas/ganti-lokasi-bulk', [BerkasController::class, 'gantiLokasiBulk'])->name('berkas.gantiLokasiBulk');
-    Route::post('surat/berkas/pindah/{id}/{status}', [BerkasController::class, 'pindah'])->name('berkas.pindah');
+    Route::get('surat/berkas/buka/{id}', [BerkasContentController::class, 'buka'])->name('berkas.buka');
+    Route::get('surat/berkas/aktif/list', [BerkasContentController::class, 'daftarBerkasAktif'])->name('berkas.aktif.list');
+    Route::post('surat/berkas/keluarkan/{idBerkas}/{jenis}/{idSurat}', [BerkasContentController::class, 'keluarkan'])->name('berkas.keluarkan');
+    Route::post('surat/berkas/ganti-lokasi-bulk', [BerkasContentController::class, 'gantiLokasiBulk'])->name('berkas.gantiLokasiBulk');
+    Route::post('surat/berkas/pindah/{id}/{status}', [BerkasStatusController::class, 'pindah'])->name('berkas.pindah');
     Route::get('surat/berkas/tambah', [BerkasController::class, 'tambah'])->name('berkas.tambah');
     Route::post('surat/berkas/tambah', [BerkasController::class, 'store']);
     Route::get('surat/berkas/edit/{id}', [BerkasController::class, 'edit'])->name('berkas.edit');

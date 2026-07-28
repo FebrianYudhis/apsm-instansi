@@ -35,7 +35,7 @@ return [
         ],
     ],
 
-    'google2fa' => [
+    'mfa' => [
         'secret' => env('MFA_SECRET'),
     ],
 

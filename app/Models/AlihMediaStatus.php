@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AlihMediaStatus extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'nama_status',
+    ];
 
     public function filelists()
     {
