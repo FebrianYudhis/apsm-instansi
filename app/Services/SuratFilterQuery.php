@@ -62,7 +62,8 @@ class SuratFilterQuery
             $query,
             $filters['sumber_surat'],
             $filters['tanggal_dari'],
-            $filters['tanggal_sampai']
+            $filters['tanggal_sampai'],
+            'tanggal_diterima'
         );
     }
 
@@ -74,7 +75,8 @@ class SuratFilterQuery
             $query,
             $filters['jalur_pengiriman'],
             $filters['tanggal_dari'],
-            $filters['tanggal_sampai']
+            $filters['tanggal_sampai'],
+            'tanggal_surat'
         );
     }
 
@@ -82,7 +84,8 @@ class SuratFilterQuery
         Builder $query,
         string $srikandiFilter,
         ?string $tanggalDari,
-        ?string $tanggalSampai
+        ?string $tanggalSampai,
+        string $dateColumn
     ): Builder {
         if ($srikandiFilter === 'srikandi') {
             $query->where('is_srikandi', true);
@@ -91,11 +94,11 @@ class SuratFilterQuery
         }
 
         if ($tanggalDari) {
-            $query->whereDate('tanggal_surat', '>=', $tanggalDari);
+            $query->whereDate($dateColumn, '>=', $tanggalDari);
         }
 
         if ($tanggalSampai) {
-            $query->whereDate('tanggal_surat', '<=', $tanggalSampai);
+            $query->whereDate($dateColumn, '<=', $tanggalSampai);
         }
 
         return $query;

@@ -28,28 +28,32 @@ class SuratMasukExportTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function test_export_filters_srikandi_and_non_srikandi_by_letter_date()
+    public function test_export_filters_srikandi_and_non_srikandi_by_received_date()
     {
         $this->makeIncoming([
             'nomor_agenda' => 1,
-            'tanggal_surat' => '2026-01-15',
+            'tanggal_diterima' => '2026-01-15',
+            'tanggal_surat' => '2026-02-15',
             'nomor_surat' => 'MANUAL/DI-LUAR',
         ]);
         $this->makeIncoming([
             'nomor_agenda' => 2,
-            'tanggal_surat' => '2026-02-10',
+            'tanggal_diterima' => '2026-02-10',
+            'tanggal_surat' => '2026-01-10',
             'nomor_surat' => 'MANUAL/DALAM',
             'perihal' => '=1+1',
         ]);
         $this->makeIncoming([
             'nomor_agenda' => null,
-            'tanggal_surat' => '2026-02-20',
+            'tanggal_diterima' => '2026-02-20',
+            'tanggal_surat' => '2026-01-20',
             'nomor_surat' => 'SRIKANDI/DALAM',
             'is_srikandi' => true,
         ]);
         $this->makeIncoming([
             'nomor_agenda' => null,
-            'tanggal_surat' => '2025-02-20',
+            'tanggal_diterima' => '2025-02-20',
+            'tanggal_surat' => '2025-01-20',
             'nomor_surat' => 'SRIKANDI/TAHUN-LAIN',
             'tahun' => 2025,
             'is_srikandi' => true,
@@ -84,7 +88,7 @@ class SuratMasukExportTest extends TestCase
             $srikandiSheet->getCell('A4')->getValue()
         );
         $this->assertSame(
-            'Periode Tanggal Surat: 01-02-2026 s.d. 28-02-2026',
+            'Periode Tanggal Diterima: 01-02-2026 s.d. 28-02-2026',
             $srikandiSheet->getCell('A5')->getValue()
         );
         $this->assertSame('SRIKANDI', $srikandiSheet->getCell('A8')->getValue());
@@ -115,18 +119,21 @@ class SuratMasukExportTest extends TestCase
     {
         $this->makeIncoming([
             'nomor_agenda' => 1,
-            'tanggal_surat' => '2026-02-10',
+            'tanggal_diterima' => '2026-02-10',
+            'tanggal_surat' => '2026-03-10',
             'nomor_surat' => 'MANUAL/FILTER',
         ]);
         $this->makeIncoming([
             'nomor_agenda' => null,
-            'tanggal_surat' => '2026-02-20',
+            'tanggal_diterima' => '2026-02-20',
+            'tanggal_surat' => '2026-01-20',
             'nomor_surat' => 'SRIKANDI/FILTER',
             'is_srikandi' => true,
         ]);
         $this->makeIncoming([
             'nomor_agenda' => null,
-            'tanggal_surat' => '2026-03-20',
+            'tanggal_diterima' => '2026-03-20',
+            'tanggal_surat' => '2026-02-20',
             'nomor_surat' => 'SRIKANDI/DI-LUAR',
             'is_srikandi' => true,
         ]);
@@ -166,6 +173,8 @@ class SuratMasukExportTest extends TestCase
             ->assertSee('name="tanggal_sampai"', false)
             ->assertSee('btnCariFilter', false)
             ->assertSee('btnExportSuratMasuk', false)
+            ->assertSee('Tanggal Diterima Dari')
+            ->assertSee('Tanggal Diterima Sampai')
             ->assertSee('Terapkan Filter')
             ->assertSee('Unduh Excel dengan Filter Aktif');
     }

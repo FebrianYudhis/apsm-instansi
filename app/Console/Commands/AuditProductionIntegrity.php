@@ -45,7 +45,11 @@ class AuditProductionIntegrity extends Command
             $this->renderTableReport($report);
         }
 
-        return count($report['findings']) === 0 ? self::SUCCESS : self::FAILURE;
+        $hasReconciliationMismatch = $report['reconciliation']['synchronized'] === false;
+
+        return count($report['findings']) === 0 && ! $hasReconciliationMismatch
+            ? self::SUCCESS
+            : self::FAILURE;
     }
 
     private function parseYear($value)
@@ -81,6 +85,8 @@ class AuditProductionIntegrity extends Command
             ]
         );
 
+        $this->renderReconciliation($report['reconciliation']);
+
         $this->newLine();
         $this->line('Data soft deleted (informasi, tidak mengubah exit code):');
         $this->table(
@@ -94,9 +100,14 @@ class AuditProductionIntegrity extends Command
             ]
         );
 
-        if (count($report['findings']) === 0) {
+        if (count($report['findings']) === 0
+            && $report['reconciliation']['synchronized'] !== false) {
             $this->info('OK: tidak ditemukan masalah integritas.');
 
+            return;
+        }
+
+        if (count($report['findings']) === 0) {
             return;
         }
 
@@ -118,6 +129,88 @@ class AuditProductionIntegrity extends Command
             'Ditemukan '.$report['counts']['errors'].' error dan '
             .$report['counts']['warnings'].' warning. Tidak ada data yang diubah.'
         );
+    }
+
+    private function renderReconciliation(array $reconciliation): void
+    {
+        $this->newLine();
+        $this->line('Rekonsiliasi referensi database dan file fisik:');
+        $this->line($reconciliation['scope']);
+
+        $databaseRows = [];
+        $labels = [
+            'incomings' => 'Surat Masuk',
+            'outcomings' => 'Surat Keluar',
+            'digitals' => 'Surat Digital',
+        ];
+
+        foreach ($reconciliation['database'] as $type => $summary) {
+            $watermark = $summary['watermark'];
+            $problematic = $summary['rows'] - $summary['original']['valid_in_expected_root'];
+            $duplicates = $summary['original']['duplicate_references'];
+
+            if ($watermark !== null) {
+                $problematic += $watermark['invalid_or_wrong_root'];
+                $duplicates += $watermark['duplicate_references'];
+            }
+
+            $databaseRows[] = [
+                $labels[$type] ?? $type,
+                $summary['rows'],
+                $summary['original']['valid_in_expected_root'],
+                $watermark === null ? '-' : $watermark['valid_in_expected_root'],
+                $problematic,
+                $duplicates,
+            ];
+        }
+
+        $this->table(
+            ['Data', 'Row DB', 'Ref Asli Valid', 'Ref Alih Media Valid', 'Ref Bermasalah', 'Ref Duplikat'],
+            $databaseRows
+        );
+
+        if ($reconciliation['storage'] === null) {
+            $this->warn('Pemindaian isi folder dilewati karena opsi --no-orphans.');
+
+            return;
+        }
+
+        $storageRows = [];
+        foreach ($reconciliation['storage']['roots'] as $root => $summary) {
+            $storageRows[] = [
+                $root,
+                $summary['references'],
+                $summary['unique_references'],
+                $summary['private_files'],
+                $summary['missing_private_files'],
+                $summary['orphan_private_files'],
+                $summary['public_files'],
+                $summary['synchronized'] ? 'SESUAI' : 'TIDAK SESUAI',
+            ];
+        }
+
+        $totals = $reconciliation['storage']['totals'];
+        $storageRows[] = [
+            'TOTAL',
+            $totals['references'],
+            $totals['unique_references'],
+            $totals['private_files'],
+            $totals['missing_private_files'],
+            $totals['orphan_private_files'],
+            $totals['public_files'],
+            $reconciliation['synchronized'] ? 'SESUAI' : 'TIDAK SESUAI',
+        ];
+
+        $this->table(
+            ['Folder', 'Ref DB', 'Ref Unik', 'File Private', 'Hilang', 'Yatim', 'File Public', 'Status'],
+            $storageRows
+        );
+
+        if ($reconciliation['synchronized']) {
+            $this->info('SESUAI: seluruh referensi database cocok dengan file private dan tidak ada file yatim/public.');
+        } else {
+            $this->warn('TIDAK SESUAI: periksa kolom bermasalah, file hilang, file yatim, duplikasi referensi, atau file public.');
+        }
     }
 
     private function softDeletedRow(string $label, array $summary): array

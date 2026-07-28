@@ -25,7 +25,7 @@ class SuratPencatatanExporter
     {
         $letters = $this->suratFilter
             ->incoming($year, $filters)
-            ->orderBy('tanggal_surat')
+            ->orderBy('tanggal_diterima')
             ->orderBy('nomor_surat')
             ->get();
 
@@ -42,7 +42,7 @@ class SuratPencatatanExporter
         $sheet->setCellValue('A2', config('app.pencipta_arsip'));
         $sheet->setCellValue('A3', 'Tahun '.$year);
         $sheet->setCellValue('A4', 'Sumber Surat: '.$sourceLabels[$filters['sumber_surat']]);
-        $sheet->setCellValue('A5', 'Periode Tanggal Surat: '.$this->formatPeriod($filters));
+        $sheet->setCellValue('A5', 'Periode Tanggal Diterima: '.$this->formatPeriod($filters));
 
         foreach (range(1, 5) as $row) {
             $sheet->mergeCells("A{$row}:H{$row}");

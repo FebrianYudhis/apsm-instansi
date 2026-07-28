@@ -4,6 +4,26 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-07-28
+
+### Added
+
+- Pengujian regresi dengan tanggal surat dan tanggal diterima yang berbeda untuk memastikan filter surat masuk menggunakan kolom yang tepat.
+- Pengujian regresi untuk memastikan aktivitas login dan logout masing-masing hanya dicatat satu kali.
+- Pengujian rekonsiliasi referensi database dengan file private, file public, file hilang, file yatim, dan file alih media.
+
+### Changed
+
+- Daftar dan export surat masuk kini difilter serta diurutkan berdasarkan `tanggal_diterima`.
+- Label periode pada filter dan file Excel surat masuk kini menggunakan istilah Tanggal Diterima.
+- Filter surat keluar tetap menggunakan `tanggal_surat`.
+- Command `audit:integritas-production` kini menampilkan jumlah referensi database dan file fisik per folder, termasuk status sesuai atau tidak sesuai.
+
+### Fixed
+
+- Memperbaiki range tanggal surat masuk yang sebelumnya keliru menggunakan `tanggal_surat`.
+- Mencegah log login dan logout tercatat dua kali akibat listener didaftarkan secara otomatis sekaligus manual.
+
 ## [0.3.0] - 2026-07-28
 
 ### Added

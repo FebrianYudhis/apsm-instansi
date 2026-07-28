@@ -71,7 +71,7 @@
                 if (tanggalDari && tanggalSampai && tanggalSampai < tanggalDari) {
                     Swal.fire({
                         title: 'Filter Tidak Valid',
-                        text: 'Tanggal Surat Sampai tidak boleh lebih awal dari Tanggal Surat Dari.',
+                        text: 'Tanggal Diterima Sampai tidak boleh lebih awal dari Tanggal Diterima Dari.',
                         icon: 'error',
                     });
                     return false;
@@ -295,13 +295,13 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="filterTanggalDari">Tanggal Surat Dari</label>
+                            <label for="filterTanggalDari">Tanggal Diterima Dari</label>
                             <input type="date" id="filterTanggalDari"
                                 name="tanggal_dari" class="form-control"
                                 value="{{ request('tanggal_dari') }}">
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="filterTanggalSampai">Tanggal Surat Sampai</label>
+                            <label for="filterTanggalSampai">Tanggal Diterima Sampai</label>
                             <input type="date" id="filterTanggalSampai"
                                 name="tanggal_sampai" class="form-control"
                                 value="{{ request('tanggal_sampai') }}">

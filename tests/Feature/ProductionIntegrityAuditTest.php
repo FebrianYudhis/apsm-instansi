@@ -57,8 +57,16 @@ class ProductionIntegrityAuditTest extends TestCase
 
     public function test_integrity_command_returns_success_for_consistent_data()
     {
-        $this->makeIncoming();
-        $this->makeOutcoming();
+        $this->seed(AlihMediaStatusSeeder::class);
+        $this->filelist->update(['alih_media_status_id' => Filelist::ALIH_MEDIA_DONE]);
+        $this->makeIncoming([
+            'filelist_id' => $this->filelist->id,
+            'url_watermarked' => 'dokumen/alih-media/masuk-watermark.pdf',
+        ]);
+        $this->makeOutcoming([
+            'filelist_id' => $this->filelist->id,
+            'url_watermarked' => 'dokumen/alih-media/keluar-watermark.pdf',
+        ]);
         Digital::create([
             'perihal' => 'Surat Digital',
             'url' => 'dokumen/digital/digital.pdf',
@@ -67,13 +75,33 @@ class ProductionIntegrityAuditTest extends TestCase
         Storage::disk('documents')->put('dokumen/masuk/masuk.pdf', 'pdf');
         Storage::disk('documents')->put('dokumen/keluar/keluar.pdf', 'pdf');
         Storage::disk('documents')->put('dokumen/digital/digital.pdf', 'pdf');
+        Storage::disk('documents')->put('dokumen/alih-media/masuk-watermark.pdf', 'pdf');
+        Storage::disk('documents')->put('dokumen/alih-media/keluar-watermark.pdf', 'pdf');
 
         $report = app(ProductionIntegrityAuditor::class)->audit();
         $exitCode = Artisan::call('audit:integritas-production');
+        $commandOutput = Artisan::output();
 
         $this->assertSame(0, $exitCode);
         $this->assertTrue($report['read_only']);
         $this->assertSame([], $report['findings']);
+        $this->assertTrue($report['reconciliation']['synchronized']);
+        $this->assertSame(
+            2,
+            $report['reconciliation']['storage']['roots']['dokumen/alih-media']['references']
+        );
+        $this->assertSame(
+            2,
+            $report['reconciliation']['storage']['roots']['dokumen/alih-media']['private_files']
+        );
+        $this->assertSame(5, $report['reconciliation']['storage']['totals']['references']);
+        $this->assertSame(5, $report['reconciliation']['storage']['totals']['private_files']);
+        $this->assertSame(5, $report['counts']['files_scanned']);
+        $this->assertStringContainsString(
+            'Rekonsiliasi referensi database dan file fisik',
+            $commandOutput
+        );
+        $this->assertStringContainsString('SESUAI', $commandOutput);
     }
 
     public function test_integrity_command_reports_missing_watermarks_and_orphan_files()
@@ -98,6 +126,39 @@ class ProductionIntegrityAuditTest extends TestCase
         $this->assertContains('document.file_missing', $codes);
         $this->assertContains('document.orphan_file', $codes);
         $this->assertContains('alih_media.incomplete_watermarks', $codes);
+        $this->assertFalse($report['reconciliation']['synchronized']);
+        $this->assertSame(
+            1,
+            $report['reconciliation']['storage']['roots']['dokumen/alih-media']['missing_private_files']
+        );
+        $this->assertSame(
+            1,
+            $report['reconciliation']['storage']['roots']['dokumen/digital']['orphan_private_files']
+        );
+        $this->assertStringContainsString('"synchronized": false', Artisan::output());
+    }
+
+    public function test_integrity_reconciliation_detects_multiple_rows_referencing_one_file()
+    {
+        $this->makeIncoming();
+        $this->makeIncoming([
+            'nomor_agenda' => 2,
+            'nomor_surat' => 'IN/002',
+        ]);
+        Storage::disk('documents')->put('dokumen/masuk/masuk.pdf', 'pdf');
+
+        $report = app(ProductionIntegrityAuditor::class)->audit();
+        $incomingStorage = $report['reconciliation']['storage']['roots']['dokumen/masuk'];
+
+        $this->assertFalse($report['reconciliation']['synchronized']);
+        $this->assertSame(2, $incomingStorage['references']);
+        $this->assertSame(1, $incomingStorage['unique_references']);
+        $this->assertSame(1, $incomingStorage['duplicate_references']);
+        $this->assertSame(1, $incomingStorage['private_files']);
+        $this->assertContains(
+            'document.duplicate_reference',
+            array_column($report['findings'], 'code')
+        );
     }
 
     public function test_year_filter_does_not_create_false_orphans_and_command_does_not_mutate_data()
