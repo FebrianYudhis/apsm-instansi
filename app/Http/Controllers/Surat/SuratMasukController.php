@@ -7,20 +7,23 @@ use App\Models\Access;
 use App\Models\Filelist;
 use App\Models\Incoming;
 use App\Rules\ValidPdf;
+use App\Services\ActiveYear;
 use App\Services\DocumentService;
 use App\Services\FilelistMutationLock;
 use App\Services\SuratFilterQuery;
 use App\Services\SuratPencatatanExporter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use RealRashid\SweetAlert\Facades\Alert;
+use Throwable;
 
 class SuratMasukController extends Controller
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function tambah()
     {
         $data = [
@@ -76,7 +79,7 @@ class SuratMasukController extends Controller
         } else {
             $agendaSudahDigunakan = Incoming::withTrashed()
                 ->where('nomor_agenda', request('nomorAgenda'))
-                ->where('tahun', Auth::user()->tahun)
+                ->where('tahun', $this->activeYear->current())
                 ->exists();
             if ($agendaSudahDigunakan) {
                 Alert::error('Gagal', 'Nomor Agenda Sudah Digunakan');
@@ -107,14 +110,14 @@ class SuratMasukController extends Controller
                 'tanggal_surat' => request('tanggalSurat'),
                 'perihal' => request('perihal'),
                 'url' => $dokumen,
-                'tahun' => Auth::user()->tahun,
+                'tahun' => $this->activeYear->current(),
                 'is_srikandi' => $isSrikandi,
                 'filelist_id' => request('pemberkasan') == 'null' ? null : request('pemberkasan'),
                 'access_id' => request('sifat'),
             ]);
             DB::transaction(function () use ($masukkan, $nomorAgenda) {
                 app(FilelistMutationLock::class)->lock(null, $masukkan->filelist_id);
-                $this->ensureAgendaAvailable($nomorAgenda, Auth::user()->tahun);
+                $this->ensureAgendaAvailable($nomorAgenda, $this->activeYear->current());
                 $masukkan->saveOrFail();
             });
         } catch (Throwable $exception) {
@@ -136,7 +139,7 @@ class SuratMasukController extends Controller
             return redirect()->route('surat.masuk');
         }
 
-        if ($surat->tahun != Auth::user()->tahun) {
+        if ($surat->tahun != $this->activeYear->current()) {
             Alert::error('Gagal', 'Anda Tidak Memiliki Akses');
 
             return redirect()->route('surat.masuk');
@@ -156,7 +159,7 @@ class SuratMasukController extends Controller
 
                 if (
                     ! $lockedSurat
-                    || (int) $lockedSurat->tahun !== (int) Auth::user()->tahun
+                    || (int) $lockedSurat->tahun !== $this->activeYear->current()
                     || (int) $lockedSurat->filelist_id !== (int) $currentFilelistId
                 ) {
                     return false;
@@ -190,7 +193,7 @@ class SuratMasukController extends Controller
             Alert::error('Gagal', 'Surat Masuk Tidak Ditemukan');
 
             return redirect()->route('surat.masuk');
-        } elseif ($surat->tahun != Auth::user()->tahun) {
+        } elseif ($surat->tahun != $this->activeYear->current()) {
             Alert::error('Gagal', 'Anda Tidak Memiliki Akses');
 
             return redirect()->route('surat.masuk');
@@ -221,7 +224,7 @@ class SuratMasukController extends Controller
             return redirect()->route('surat.masuk');
         }
 
-        if ($surat->tahun != Auth::user()->tahun) {
+        if ($surat->tahun != $this->activeYear->current()) {
             Alert::error('Gagal', 'Anda Tidak Memiliki Akses');
 
             return redirect()->route('surat.masuk');
@@ -275,7 +278,7 @@ class SuratMasukController extends Controller
         } else {
             $agendaSudahDigunakan = Incoming::withTrashed()
                 ->where('nomor_agenda', request('nomorAgenda'))
-                ->where('tahun', Auth::user()->tahun)
+                ->where('tahun', $this->activeYear->current())
                 ->where('id', '!=', $id)
                 ->exists();
             if ($agendaSudahDigunakan) {
@@ -326,7 +329,7 @@ class SuratMasukController extends Controller
 
                 if (
                     ! $lockedSurat
-                    || (int) $lockedSurat->tahun !== (int) Auth::user()->tahun
+                    || (int) $lockedSurat->tahun !== $this->activeYear->current()
                     || (int) $lockedSurat->filelist_id !== (int) $currentFilelistId
                 ) {
                     throw ValidationException::withMessages([
@@ -344,7 +347,7 @@ class SuratMasukController extends Controller
                     ]);
                 }
 
-                $this->ensureAgendaAvailable($nomorAgenda, Auth::user()->tahun, $id);
+                $this->ensureAgendaAvailable($nomorAgenda, $this->activeYear->current(), $id);
                 $lockedSurat->fill($changes);
                 $lockedSurat->saveOrFail();
                 $surat = $lockedSurat;
@@ -408,6 +411,6 @@ class SuratMasukController extends Controller
     ) {
         $filters = $suratFilter->validateIncoming($request);
 
-        return $exporter->incoming((int) Auth::user()->tahun, $filters);
+        return $exporter->incoming($this->activeYear->current(), $filters);
     }
 }

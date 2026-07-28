@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ExportActivityLogger
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function logPrepared(
         string $jenisExport,
         int $jumlahBaris,
@@ -17,7 +19,7 @@ class ExportActivityLogger
         $properties = array_merge([
             'jenis_export' => $jenisExport,
             'status' => 'prepared',
-            'tahun_aktif' => $user ? (int) $user->tahun : null,
+            'tahun_aktif' => $user ? $this->activeYear->current() : null,
             'filter' => $this->sanitize($filters),
             'jumlah_baris' => $jumlahBaris,
             'nama_file' => $namaFile,

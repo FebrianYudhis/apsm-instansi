@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ActiveYear;
 use App\Services\SuratFilterQuery;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 
 class SuratListController extends Controller
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function masuk(Request $request, SuratFilterQuery $suratFilter)
     {
         $filters = $suratFilter->validateIncoming($request);
@@ -17,7 +19,7 @@ class SuratListController extends Controller
             return view('app.surat.masuk.index', ['judul' => 'List Surat Masuk']);
         }
 
-        $query = $suratFilter->incoming((int) Auth::user()->tahun, $filters)
+        $query = $suratFilter->incoming($this->activeYear->current(), $filters)
             ->with(['filelist.classification', 'access'])
             ->orderByDesc('tanggal_diterima')
             ->orderByDesc('nomor_agenda');
@@ -36,7 +38,7 @@ class SuratListController extends Controller
             return view('app.surat.keluar.index', ['judul' => 'List Surat Keluar']);
         }
 
-        $query = $suratFilter->outgoing((int) Auth::user()->tahun, $filters)
+        $query = $suratFilter->outgoing($this->activeYear->current(), $filters)
             ->with(['filelist.classification', 'access'])
             ->orderByDesc('tanggal_surat');
 

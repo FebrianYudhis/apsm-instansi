@@ -8,13 +8,15 @@ use App\Models\Filelist;
 use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
+use App\Services\ActiveYear;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use Yajra\DataTables\DataTables;
 
 class AppController extends Controller
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function digital(Request $request)
     {
         if ($request->ajax()) {
@@ -99,7 +101,7 @@ class AppController extends Controller
             'surat' => $surat,
             'editUrl' => $editRoute,
             'editPath' => $editPath,
-            'requiresYearSwitch' => (int) $surat->tahun !== (int) Auth::user()->tahun,
+            'requiresYearSwitch' => (int) $surat->tahun !== $this->activeYear->current(),
         ];
 
         return view('app.surat.detail-item', $data);

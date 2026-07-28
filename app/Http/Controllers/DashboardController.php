@@ -7,13 +7,15 @@ use App\Models\Filelist;
 use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
-use Illuminate\Support\Facades\Auth;
+use App\Services\ActiveYear;
 
 class DashboardController extends Controller
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function index()
     {
-        $tahun = (int) Auth::user()->tahun;
+        $tahun = $this->activeYear->current();
         $statusAktifId = Status::where('nama_status', Status::ACTIVE)->value('id');
         $statusInaktifId = Status::where('nama_status', Status::INACTIVE)->value('id');
 

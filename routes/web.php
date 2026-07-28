@@ -21,6 +21,7 @@ use App\Http\Controllers\Surat\SuratKeluarController;
 use App\Http\Controllers\Surat\SuratMasukController;
 use App\Http\Controllers\SuratListController;
 use App\Http\Controllers\YearController;
+use App\Http\Middleware\EnsureActiveYear;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,7 @@ Route::get('/', [LoginController::class, 'showLoginForm']);
 
 Auth::routes(['register' => false, 'reset' => false]);
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
     Route::get('dokumen/{jenis}/{id}/{versi?}', [DocumentController::class, 'admin'])
         ->name('document.admin')
         ->where([

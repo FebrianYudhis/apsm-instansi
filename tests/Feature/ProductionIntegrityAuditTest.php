@@ -45,6 +45,16 @@ class ProductionIntegrityAuditTest extends TestCase
         ]);
     }
 
+    public function test_documents_disk_uses_private_local_storage()
+    {
+        $diskName = config('documents.disk');
+
+        $this->assertSame('documents', $diskName);
+        $this->assertSame('local', config("filesystems.disks.{$diskName}.driver"));
+        $this->assertSame(storage_path('app/private'), config("filesystems.disks.{$diskName}.root"));
+        $this->assertFalse(config("filesystems.disks.{$diskName}.serve"));
+    }
+
     public function test_integrity_command_returns_success_for_consistent_data()
     {
         $this->makeIncoming();

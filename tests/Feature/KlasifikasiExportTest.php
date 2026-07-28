@@ -15,7 +15,7 @@ class KlasifikasiExportTest extends TestCase
 
     public function test_authenticated_user_can_export_active_classifications_to_excel()
     {
-        $user = User::factory()->create(['tahun' => now()->year]);
+        $user = User::factory()->create();
         Classification::create([
             'kode_klasifikasi' => 'TU.02',
             'keterangan' => '=HYPERLINK("https://example.test")',
@@ -67,7 +67,7 @@ class KlasifikasiExportTest extends TestCase
 
     public function test_classification_page_contains_the_excel_export_action()
     {
-        $user = User::factory()->create(['tahun' => now()->year]);
+        $user = User::factory()->create();
 
         $this->actingAs($user)
             ->get(route('surat.klasifikasi'))
@@ -78,7 +78,7 @@ class KlasifikasiExportTest extends TestCase
 
     public function test_empty_classification_list_can_still_be_exported()
     {
-        $user = User::factory()->create(['tahun' => now()->year]);
+        $user = User::factory()->create();
 
         $this->actingAs($user)
             ->get(route('surat.klasifikasi.export'))

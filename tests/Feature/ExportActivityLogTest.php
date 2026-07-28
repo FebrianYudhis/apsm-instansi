@@ -19,7 +19,7 @@ class ExportActivityLogTest extends TestCase
 
     public function test_excel_exports_are_recorded_without_letter_contents()
     {
-        $user = User::factory()->create(['tahun' => 2026]);
+        $user = User::factory()->create();
 
         Incoming::create([
             'nomor_agenda' => null,
@@ -48,7 +48,7 @@ class ExportActivityLogTest extends TestCase
         ]);
 
         Activity::query()->delete();
-        $this->actingAs($user);
+        $this->withActiveYear(2026)->actingAs($user);
 
         $this->get(route('surat.masuk.export-pencatatan', [
             'sumber_surat' => 'srikandi',
@@ -126,7 +126,7 @@ class ExportActivityLogTest extends TestCase
     {
         $this->seed(AlihMediaStatusSeeder::class);
 
-        $user = User::factory()->create(['tahun' => 2026]);
+        $user = User::factory()->create();
         $status = Status::create(['nama_status' => 'Aktif']);
         $classification = Classification::create([
             'kode_klasifikasi' => 'AM.01',
@@ -176,7 +176,7 @@ class ExportActivityLogTest extends TestCase
         ]);
 
         Activity::query()->delete();
-        $this->actingAs($user);
+        $this->withActiveYear(2026)->actingAs($user);
 
         $this->get(route('surat.berkas.export', [
             'jenis_export' => 'daftar_isi_berkas',

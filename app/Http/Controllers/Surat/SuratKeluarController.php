@@ -7,20 +7,23 @@ use App\Models\Access;
 use App\Models\Filelist;
 use App\Models\Outcoming;
 use App\Rules\ValidPdf;
+use App\Services\ActiveYear;
 use App\Services\DocumentService;
 use App\Services\FilelistMutationLock;
 use App\Services\SuratFilterQuery;
 use App\Services\SuratPencatatanExporter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use RealRashid\SweetAlert\Facades\Alert;
+use Throwable;
 
 class SuratKeluarController extends Controller
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function tambah()
     {
         $data = [
@@ -48,7 +51,7 @@ class SuratKeluarController extends Controller
                 'tujuan' => $data['tujuan'],
                 'perihal' => $data['perihal'],
                 'url' => $dokumen,
-                'tahun' => Auth::user()->tahun,
+                'tahun' => $this->activeYear->current(),
                 'is_digital' => $data['is_digital'],
                 'is_srikandi' => $data['is_srikandi'],
                 'filelist_id' => $data['pemberkasan'],
@@ -77,7 +80,7 @@ class SuratKeluarController extends Controller
             return redirect()->route('surat.keluar');
         }
 
-        if ($surat->tahun != Auth::user()->tahun) {
+        if ($surat->tahun != $this->activeYear->current()) {
             Alert::error('Gagal', 'Anda Tidak Memiliki Akses');
 
             return redirect()->route('surat.keluar');
@@ -97,7 +100,7 @@ class SuratKeluarController extends Controller
 
                 if (
                     ! $lockedSurat
-                    || (int) $lockedSurat->tahun !== (int) Auth::user()->tahun
+                    || (int) $lockedSurat->tahun !== $this->activeYear->current()
                     || (int) $lockedSurat->filelist_id !== (int) $currentFilelistId
                 ) {
                     return false;
@@ -131,7 +134,7 @@ class SuratKeluarController extends Controller
             Alert::error('Gagal', 'Surat Keluar Tidak Ditemukan');
 
             return redirect()->route('surat.keluar');
-        } elseif ($surat->tahun != Auth::user()->tahun) {
+        } elseif ($surat->tahun != $this->activeYear->current()) {
             Alert::error('Gagal', 'Anda Tidak Memiliki Akses');
 
             return redirect()->route('surat.keluar');
@@ -162,7 +165,7 @@ class SuratKeluarController extends Controller
             return redirect()->route('surat.keluar');
         }
 
-        if ($surat->tahun != Auth::user()->tahun) {
+        if ($surat->tahun != $this->activeYear->current()) {
             Alert::error('Gagal', 'Anda Tidak Memiliki Akses');
 
             return redirect()->route('surat.keluar');
@@ -224,7 +227,7 @@ class SuratKeluarController extends Controller
 
                 if (
                     ! $lockedSurat
-                    || (int) $lockedSurat->tahun !== (int) Auth::user()->tahun
+                    || (int) $lockedSurat->tahun !== $this->activeYear->current()
                     || (int) $lockedSurat->filelist_id !== (int) $currentFilelistId
                 ) {
                     throw ValidationException::withMessages([
@@ -325,6 +328,6 @@ class SuratKeluarController extends Controller
     ) {
         $filters = $suratFilter->validateOutgoing($request);
 
-        return $exporter->outgoing((int) Auth::user()->tahun, $filters);
+        return $exporter->outgoing($this->activeYear->current(), $filters);
     }
 }

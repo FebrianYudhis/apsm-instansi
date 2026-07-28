@@ -228,10 +228,10 @@
                 </div>
 
                 {{-- Alert tahun berbeda --}}
-                @if (!$isAlihMediaLocked && $surat->tahun != auth()->user()->tahun)
+                @if (!$isAlihMediaLocked && $surat->tahun != $activeYear)
                     <div class="alert alert-info mb-0" style="border-radius: 0; border-left: 0; border-right: 0;">
                         <i class="fa fa-info-circle mr-1"></i>
-                        Tahun aktif saat ini <strong>{{ auth()->user()->tahun }}</strong>. Tombol edit akan memindahkan tahun ke <strong>{{ $surat->tahun }}</strong> terlebih dahulu.
+                        Tahun aktif saat ini <strong>{{ $activeYear }}</strong>. Tombol edit akan memindahkan tahun ke <strong>{{ $surat->tahun }}</strong> terlebih dahulu.
                     </div>
                 @endif
 

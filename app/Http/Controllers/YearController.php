@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ActiveYear;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class YearController extends Controller
 {
+    public function __construct(private ActiveYear $activeYear) {}
+
     public function switch(Request $request, int $tahun)
     {
         $startYear = (int) config('app.start_year', 2025);
@@ -14,7 +17,7 @@ class YearController extends Controller
 
         abort_unless($tahun >= $startYear && $tahun <= $currentYear, 404);
 
-        $request->user()->forceFill(['tahun' => $tahun])->save();
+        $this->activeYear->select($tahun);
 
         Alert::success('Berhasil', 'Berhasil Pindah Ke Tahun '.$tahun);
 

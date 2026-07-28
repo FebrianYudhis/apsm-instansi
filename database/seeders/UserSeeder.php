@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -39,7 +38,6 @@ class UserSeeder extends Seeder
             'name' => 'Admin Aplikasi',
             'email' => 'admin@app.test',
             'password' => Hash::make('admin123'),
-            'tahun' => Carbon::now()->year,
         ]);
         $admin->id = 1;
         $admin->save();

@@ -23,7 +23,6 @@ class SeederIdempotencyTest extends TestCase
         $admin->update([
             'name' => 'Admin Production',
             'password' => Hash::make('password-production'),
-            'tahun' => 2024,
         ]);
 
         $this->seed(DatabaseSeeder::class);
@@ -56,7 +55,6 @@ class SeederIdempotencyTest extends TestCase
         $this->assertSame(1, User::where('username', 'admin')->count());
         $this->assertSame(1, (int) $admin->id);
         $this->assertSame('Admin Production', $admin->name);
-        $this->assertSame(2024, (int) $admin->tahun);
         $this->assertTrue(Hash::check('password-production', $admin->password));
     }
 }

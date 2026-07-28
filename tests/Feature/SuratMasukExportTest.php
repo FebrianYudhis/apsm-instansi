@@ -22,7 +22,8 @@ class SuratMasukExportTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create(['tahun' => 2026]);
+        $this->user = User::factory()->create();
+        $this->withActiveYear(2026);
         $this->access = Access::create(['sifat_akses' => 'Biasa']);
         $this->actingAs($this->user);
     }

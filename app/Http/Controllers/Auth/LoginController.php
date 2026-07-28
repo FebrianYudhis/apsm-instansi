@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActiveYear;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class LoginController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(private ActiveYear $activeYear)
     {
         $this->middleware('guest')->except('logout');
     }
@@ -74,8 +75,7 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        $user->tahun = (int) $request->tahun;
-        $user->save();
+        $this->activeYear->select((int) $request->tahun);
     }
 
     protected function sendFailedLoginResponse(Request $request)

@@ -30,7 +30,8 @@ class BerkasIntegrityRegressionTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create(['tahun' => 2026]);
+        $this->user = User::factory()->create();
+        $this->withActiveYear(2026);
         Status::create(['id' => 1, 'nama_status' => Status::ACTIVE]);
         $this->classification = Classification::create([
             'kode_klasifikasi' => 'TU.01',

@@ -6,7 +6,6 @@ use App\Models\Digital;
 use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\User;
-use Carbon\Carbon;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -74,20 +73,10 @@ class FactoryConsistencyTest extends TestCase
         $this->assertCount(count($paths), array_unique($paths));
     }
 
-    public function test_user_factory_uses_configured_start_year_through_current_year()
+    public function test_user_factory_does_not_persist_the_active_year()
     {
-        Carbon::setTestNow('2026-07-26 12:00:00');
-        config(['app.start_year' => 2025]);
+        $user = User::factory()->make();
 
-        try {
-            $users = User::factory()->count(50)->make();
-
-            foreach ($users as $user) {
-                $this->assertGreaterThanOrEqual(2025, $user->tahun);
-                $this->assertLessThanOrEqual(2026, $user->tahun);
-            }
-        } finally {
-            Carbon::setTestNow();
-        }
+        $this->assertArrayNotHasKey('tahun', $user->getAttributes());
     }
 }

@@ -47,7 +47,8 @@ class SuratSafetyTest extends TestCase
 
         $this->seed(AlihMediaStatusSeeder::class);
 
-        $this->user = User::factory()->create(['tahun' => 2026]);
+        $this->user = User::factory()->create();
+        $this->withActiveYear(2026);
         $this->access = Access::create(['sifat_akses' => 'Biasa']);
         $this->activeStatus = Status::create(['nama_status' => Status::ACTIVE]);
         $this->proposedTransferStatus = Status::create(['nama_status' => Status::PROPOSE_TRANSFER]);
@@ -488,7 +489,7 @@ class SuratSafetyTest extends TestCase
         $this->post(route('pindah-tahun', ['tahun' => 9999]))
             ->assertNotFound();
 
-        $this->assertSame(2026, (int) $this->user->fresh()->tahun);
+        $this->assertSame(2026, session('active_year'));
     }
 
     public function test_dispatch_failure_restores_alih_media_status()

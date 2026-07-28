@@ -4,6 +4,25 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-07-28
+
+### Added
+
+- Disk `documents` untuk menyimpan dokumen arsip secara private di `storage/app/private`.
+- Pengujian regresi untuk konfigurasi disk dokumen, penggunaan tahun aktif berbasis session, serta cleanup file ketika transaksi database gagal.
+- Middleware dan service tahun aktif untuk menyediakan tahun kerja yang konsisten pada seluruh halaman terautentikasi.
+
+### Changed
+
+- Tahun aktif kini disimpan dalam session pengguna dan tidak lagi ditulis ke kolom `users.tahun`.
+- Filter dashboard, daftar surat, penyimpanan surat, validasi akses, dan ekspor kini menggunakan tahun aktif dari session.
+- Kolom `users.tahun` dihapus melalui migration karena pilihan tahun bersifat sementara untuk setiap session browser.
+
+### Fixed
+
+- Command audit integritas production kini dapat mengakses disk `documents` yang sebelumnya belum memiliki driver.
+- File dokumen yang baru diunggah kini dihapus kembali apabila penyimpanan atau pembaruan data surat gagal dalam transaksi database.
+
 ## [0.2.1] - 2026-07-28
 
 ### Added
