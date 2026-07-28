@@ -32,6 +32,8 @@ class SuratKeluarTest extends TestCase
     {
         parent::setUp();
 
+        $this->seed(AlihMediaStatusSeeder::class);
+
         $this->user = User::factory()->create(['tahun' => 2026]);
         $this->access = Access::create(['sifat_akses' => 'Biasa']);
         $status = Status::create(['nama_status' => 'Aktif']);

@@ -8,6 +8,7 @@ use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
 use App\Models\User;
+use Database\Seeders\AlihMediaStatusSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
@@ -123,6 +124,8 @@ class ExportActivityLogTest extends TestCase
 
     public function test_existing_berkas_and_alih_media_exports_are_also_recorded()
     {
+        $this->seed(AlihMediaStatusSeeder::class);
+
         $user = User::factory()->create(['tahun' => 2026]);
         $status = Status::create(['nama_status' => 'Aktif']);
         $classification = Classification::create([

@@ -4,6 +4,21 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-07-28
+
+### Added
+
+- Pengujian regresi untuk memastikan migration hanya membuat tabel `alih_media_statuses` dan seeder dapat dijalankan berulang kali tanpa menghasilkan data duplikat.
+
+### Changed
+
+- Data referensi status alih media Diproses, Selesai, Gagal, dan Ditutup kini sepenuhnya dikelola oleh `AlihMediaStatusSeeder`.
+- Pengujian fitur yang membutuhkan status alih media kini menjalankan seeder secara eksplisit.
+
+### Fixed
+
+- Mencegah benturan primary key saat mengimpor data production `alih_media_statuses` ke database fresh yang telah menjalankan migration.
+
 ## [0.2.0] - 2026-07-28
 
 ### Added

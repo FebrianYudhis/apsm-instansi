@@ -10,6 +10,7 @@ use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
 use App\Models\User;
+use Database\Seeders\AlihMediaStatusSeeder;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -43,6 +44,8 @@ class SuratSafetyTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->seed(AlihMediaStatusSeeder::class);
 
         $this->user = User::factory()->create(['tahun' => 2026]);
         $this->access = Access::create(['sifat_akses' => 'Biasa']);

@@ -10,6 +10,7 @@ use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
 use App\Services\ProductionIntegrityAuditor;
+use Database\Seeders\AlihMediaStatusSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,8 @@ class ProductionIntegrityAuditTest extends TestCase
 
     public function test_integrity_command_reports_missing_watermarks_and_orphan_files()
     {
+        $this->seed(AlihMediaStatusSeeder::class);
+
         $this->filelist->update(['alih_media_status_id' => Filelist::ALIH_MEDIA_DONE]);
         $this->makeIncoming([
             'filelist_id' => $this->filelist->id,
