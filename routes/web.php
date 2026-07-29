@@ -15,6 +15,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\KlasifikasiController;
 use App\Http\Controllers\KlasifikasiExportController;
 use App\Http\Controllers\MfaController;
+use App\Http\Controllers\PersonalAccessTokenController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Surat\SuratDigitalController;
 use App\Http\Controllers\Surat\SuratKeluarController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Surat\SuratMasukController;
 use App\Http\Controllers\SuratListController;
 use App\Http\Controllers\YearController;
 use App\Http\Middleware\EnsureActiveYear;
+use Illuminate\Http\Middleware\SetCacheHeaders;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +45,22 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
 
     Route::get('profil', [ProfileController::class, 'edit'])->name('profil.edit');
     Route::post('profil', [ProfileController::class, 'update'])->name('profil.update');
+    Route::get('token-api', [PersonalAccessTokenController::class, 'index'])
+        ->middleware(SetCacheHeaders::using([
+            'private' => true,
+            'no_store' => true,
+            'no_cache' => true,
+            'must_revalidate' => true,
+            'max_age' => 0,
+        ]))
+        ->name('api-tokens.index');
+    Route::post('token-api', [PersonalAccessTokenController::class, 'store'])
+        ->middleware('throttle:api-token-management')
+        ->name('api-tokens.store');
+    Route::delete('token-api/{token}', [PersonalAccessTokenController::class, 'destroy'])
+        ->middleware('throttle:api-token-management')
+        ->name('api-tokens.destroy')
+        ->whereNumber('token');
 
     Route::get('mfa', [MfaController::class, 'index'])->name('mfa.index');
 

@@ -90,6 +90,10 @@
                                         class="fa fa-fw fa-user"></i>Profil Saya</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('api-tokens.index') }}" class="nav-link"><i
+                                        class="fa fa-fw fa-key"></i>Token API</a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('mfa.index') }}" class="nav-link"><i
                                         class="fa fa-fw fa-qrcode"></i>Pengaturan MFA</a>
                             </li>

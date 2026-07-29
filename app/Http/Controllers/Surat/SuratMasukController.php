@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Surat;
 
+use App\Actions\CreateIncomingAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteDataRequest;
 use App\Models\Access;
@@ -36,7 +37,7 @@ class SuratMasukController extends Controller
         return view('app.surat.masuk.tambah', $data);
     }
 
-    public function store()
+    public function store(CreateIncomingAction $createIncoming)
     {
         $isSrikandi = request()->boolean('isSrikandi');
         if ($isSrikandi) {
@@ -97,34 +98,23 @@ class SuratMasukController extends Controller
             return redirect()->route('masuk.tambah')->withInput();
         }
 
-        $dokumen = app(DocumentService::class)->storeOriginal(
-            DocumentService::TYPE_INCOMING,
-            request()->file('berkas')
-        );
-
-        try {
-            $masukkan = new Incoming([
+        $createIncoming->handle(
+            [
                 'nomor_agenda' => $nomorAgenda,
                 'tanggal_diterima' => request('tanggalDiterima'),
                 'nomor_surat' => request('nomorSurat'),
                 'pengirim' => request('pengirim'),
                 'tanggal_surat' => request('tanggalSurat'),
                 'perihal' => request('perihal'),
-                'url' => $dokumen,
                 'tahun' => $this->activeYear->current(),
                 'is_srikandi' => $isSrikandi,
                 'filelist_id' => request('pemberkasan') == 'null' ? null : request('pemberkasan'),
                 'access_id' => request('sifat'),
-            ]);
-            DB::transaction(function () use ($masukkan, $nomorAgenda) {
-                app(FilelistMutationLock::class)->lock(null, $masukkan->filelist_id);
-                $this->ensureAgendaAvailable($nomorAgenda, $this->activeYear->current());
-                $masukkan->saveOrFail();
-            });
-        } catch (Throwable $exception) {
-            Storage::disk(config('documents.disk'))->delete($dokumen);
-            throw $exception;
-        }
+            ],
+            request()->file('berkas'),
+            'pemberkasan',
+            'nomorAgenda'
+        );
 
         Alert::success('Berhasil', 'Surat Masuk Berhasil Ditambahkan');
 

@@ -4,6 +4,31 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-07-29
+
+### Added
+
+- Menambahkan pengelolaan Personal Access Token berbasis Laravel Sanctum yang dapat dibuat dan dicabut sendiri oleh setiap pengguna.
+- Menambahkan API versi 1 untuk mencatat surat masuk dan surat keluar SRIKANDI maupun non-SRIKANDI dengan unggahan PDF.
+- Menambahkan endpoint referensi sifat akses dan berkas aktif untuk membantu integrasi mengisi relasi surat secara valid.
+- Menambahkan pengujian autentikasi token, pembatasan ability, kepemilikan token, aturan jenis surat, penyimpanan dokumen, dan activity log API.
+- Menambahkan modal panduan pengisian API dengan pilihan bertingkat untuk surat masuk/keluar SRIKANDI dan non-SRIKANDI beserta tabel field, contoh nilai, serta ketentuannya.
+
+### Changed
+
+- Pembuatan surat dari antarmuka web dan API kini menggunakan action yang sama agar validasi transaksi, penguncian berkas, serta pembersihan file gagal tetap konsisten.
+- Activity log surat yang dibuat melalui API kini mencatat pengguna pemilik token sebagai pelaku beserta nama dan ID token tanpa menyimpan token asli.
+
+### Security
+
+- Token API disimpan dalam bentuk hash, hanya ditampilkan sekali saat dibuat, memiliki masa berlaku, dan dibatasi pada ability `surat:create`.
+- Pembuatan token mewajibkan verifikasi kata sandi saat ini, sedangkan daftar dan pencabutan token dibatasi pada pemiliknya.
+- Endpoint API hanya menerima Bearer Personal Access Token dan dilindungi oleh autentikasi Sanctum, pemeriksaan ability, rate limiting per pengguna, serta validasi isi dan ukuran PDF.
+- Pembuatan dan pencabutan token dibatasi maksimal lima permintaan per menit untuk setiap pengguna.
+- Payload SRIKANDI yang mengirim field khusus non-SRIKANDI ditolak dengan respons validasi `422` agar data kontradiktif tidak diterima diam-diam.
+- Menambahkan regresi keamanan API untuk token kedaluwarsa/dicabut, relasi berkas tidak valid, foreign key dan tahun, mass assignment, metadata respons, PDF palsu/terlalu besar, duplikasi agenda, rate limiting aktual, serta escaping nama token.
+- Halaman yang menampilkan token satu kali kini mengirim header `private`, `no-store`, dan `no-cache`, serta menonaktifkan autocomplete dan spellcheck pada field token.
+
 ## [0.6.2] - 2026-07-29
 
 ### Added

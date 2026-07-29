@@ -27,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip())
         );
+        RateLimiter::for('api-token-management', fn (Request $request) => Limit::perMinute(5)->by($request->user()?->id ?: $request->ip())
+        );
         RateLimiter::for('guest-document-mfa', fn (Request $request) => Limit::perMinute(5)->by($request->ip())
         );
         RateLimiter::for('guest-documents', fn (Request $request) => Limit::perMinute(60)->by($request->ip())

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Surat;
 
+use App\Actions\CreateOutgoingAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeleteDataRequest;
 use App\Models\Access;
@@ -36,36 +37,25 @@ class SuratKeluarController extends Controller
         return view('app.surat.keluar.tambah', $data);
     }
 
-    public function store()
+    public function store(CreateOutgoingAction $createOutgoing)
     {
         $data = $this->validateRequest(true);
 
-        $dokumen = app(DocumentService::class)->storeOriginal(
-            DocumentService::TYPE_OUTGOING,
-            request()->file('berkas')
-        );
-
-        try {
-            $surat = new Outcoming([
+        $createOutgoing->handle(
+            [
                 'tanggal_surat' => $data['tanggalSurat'],
                 'nomor_surat' => $data['nomorSurat'],
                 'tujuan' => $data['tujuan'],
                 'perihal' => $data['perihal'],
-                'url' => $dokumen,
                 'tahun' => $this->activeYear->current(),
                 'is_digital' => $data['is_digital'],
                 'is_srikandi' => $data['is_srikandi'],
                 'filelist_id' => $data['pemberkasan'],
                 'access_id' => $data['sifat'],
-            ]);
-            DB::transaction(function () use ($surat) {
-                app(FilelistMutationLock::class)->lock(null, $surat->filelist_id);
-                $surat->saveOrFail();
-            });
-        } catch (Throwable $exception) {
-            Storage::disk(config('documents.disk'))->delete($dokumen);
-            throw $exception;
-        }
+            ],
+            request()->file('berkas'),
+            'pemberkasan'
+        );
 
         Alert::success('Berhasil', 'Surat Keluar Berhasil Ditambahkan');
 

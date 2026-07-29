@@ -9,8 +9,11 @@ use Illuminate\Validation\ValidationException;
 
 class FilelistMutationLock
 {
-    public function lock(?int $currentFilelistId, ?int $targetFilelistId): Collection
-    {
+    public function lock(
+        ?int $currentFilelistId,
+        ?int $targetFilelistId,
+        string $validationKey = 'pemberkasan'
+    ): Collection {
         $ids = array_values(array_unique(array_filter([
             $currentFilelistId,
             $targetFilelistId,
@@ -29,7 +32,7 @@ class FilelistMutationLock
             $current = $filelists->get($currentFilelistId);
             if (! $current || $current->isAlihMediaLocked()) {
                 throw ValidationException::withMessages([
-                    'pemberkasan' => 'Berkas asal sudah masuk proses alih media atau tidak valid.',
+                    $validationKey => 'Berkas asal sudah masuk proses alih media atau tidak valid.',
                 ]);
             }
         }
@@ -42,7 +45,7 @@ class FilelistMutationLock
                 || $target->isAlihMediaLocked()
             ) {
                 throw ValidationException::withMessages([
-                    'pemberkasan' => 'Berkas tujuan sudah masuk proses alih media atau tidak valid.',
+                    $validationKey => 'Berkas tujuan sudah masuk proses alih media atau tidak valid.',
                 ]);
             }
         }

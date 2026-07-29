@@ -4,6 +4,7 @@ namespace App\Models\Concerns;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Activitylog\Contracts\Activity;
 
 trait AuditsDeletion
@@ -29,6 +30,8 @@ trait AuditsDeletion
 
     public function tapActivity(Activity $activity, string $eventName): void
     {
+        $this->addApiContext($activity);
+
         if ($eventName !== 'deleted') {
             return;
         }
@@ -47,5 +50,22 @@ trait AuditsDeletion
                 'deletion_reason' => $this->deletion_reason,
             ])
         );
+    }
+
+    private function addApiContext(Activity $activity): void
+    {
+        if (! request()->is('api/*')) {
+            return;
+        }
+
+        $activity->properties = $activity->properties->put('channel', 'api');
+        $token = request()->user()?->currentAccessToken();
+
+        if ($token instanceof PersonalAccessToken) {
+            $activity->properties = $activity->properties->put('api_token', [
+                'id' => $token->getKey(),
+                'name' => $token->name,
+            ]);
+        }
     }
 }

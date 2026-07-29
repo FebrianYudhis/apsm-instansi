@@ -101,6 +101,7 @@ class ActivityLogController extends Controller
             return match ($activity->log_name) {
                 'auth' => 'Autentikasi',
                 'export' => 'Ekspor Data',
+                'api-token' => 'Token API',
                 default => 'Sistem',
             };
         }
