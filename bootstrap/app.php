@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('login');
         });
 
-        $middleware->redirectUsersTo('/app');
+        $middleware->redirectUsersTo(fn (): string => route('dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -23,7 +23,7 @@ test('login stores the selected active year in the session', function () {
         'username' => $user->username,
         'password' => 'password',
         'tahun' => 2025,
-    ])->assertRedirect('/app');
+    ])->assertRedirectToRoute('dashboard');
 
     $this->assertAuthenticatedAs($user);
     $this->assertSame(2025, session(ActiveYear::SESSION_KEY));

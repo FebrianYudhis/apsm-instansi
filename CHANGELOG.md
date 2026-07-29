@@ -4,6 +4,22 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2026-07-29
+
+### Added
+
+- Menambahkan pengujian regresi untuk memastikan redirect autentikasi tetap menggunakan subpath aplikasi.
+- Menambahkan pengujian aset CSS agar referensi lokal tidak kembali mengarah ke root host.
+
+### Changed
+
+- Route dashboard kini memiliki nama `dashboard` dan digunakan oleh navigasi serta seluruh redirect autentikasi.
+
+### Fixed
+
+- Memperbaiki redirect login dan middleware pengguna terautentikasi agar mempertahankan base URL seperti `/apsm`.
+- Menghapus referensi gambar `down-arrow.png` dan `drag-indicator.png` yang tidak tersedia dari CSS Concept.
+
 ## [0.6.0] - 2026-07-29
 
 ### Added

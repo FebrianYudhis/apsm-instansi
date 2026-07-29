@@ -20,7 +20,7 @@
 
         <div class="dashboard-header">
             <nav class="navbar navbar-expand-lg bg-white fixed-top">
-                <a class="navbar-brand" href="{{ url('/app') }}">APSM Tahun {{ $activeYear }}</a>
+                <a class="navbar-brand" href="{{ route('dashboard') }}">APSM Tahun {{ $activeYear }}</a>
             </nav>
         </div>
 
@@ -38,7 +38,7 @@
                                 Menu
                             </li>
                             <li class="nav-item">
-                                <a href="{{ url('/app') }}" class="nav-link"><i
+                                <a href="{{ route('dashboard') }}" class="nav-link"><i
                                         class="fa fa-fw fa-home"></i>Beranda</a>
                             </li>
                             <li class="nav-item ">

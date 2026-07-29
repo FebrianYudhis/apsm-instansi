@@ -27,3 +27,19 @@ test('Blade views only reference existing minified local CSS and JavaScript asse
     expect($unminifiedAssets->all())->toBe([])
         ->and($missingAssets->all())->toBe([]);
 });
+
+test('local stylesheets do not reference assets from the host root', function () {
+    $rootAssetReferences = collect(File::files(public_path('css')))
+        ->flatMap(function ($file): array {
+            preg_match_all(
+                '/url\(\s*[\'"]?\/(?!\/)([^)\'"]+)/',
+                File::get($file->getRealPath()),
+                $matches,
+            );
+
+            return $matches[1];
+        })
+        ->values();
+
+    expect($rootAssetReferences->all())->toBe([]);
+});
