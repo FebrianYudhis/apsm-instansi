@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Surat;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeleteDataRequest;
 use App\Models\Digital;
 use App\Rules\ValidPdf;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Throwable;
@@ -56,16 +58,20 @@ class SuratDigitalController extends Controller
         return redirect()->route('surat.digital');
     }
 
-    public function hapus($id)
+    public function hapus(DeleteDataRequest $request, $id)
     {
-        $surat = Digital::find($id);
-        if (! $surat) {
+        $data = DB::transaction(function () use ($id, $request) {
+            $surat = Digital::lockForUpdate()->find($id);
+
+            return $surat?->deleteWithAudit($request->user(), $request->deletionReason());
+        });
+
+        if ($data === null) {
             Alert::error('Gagal', 'Surat Digital Tidak Ditemukan');
 
             return redirect()->route('surat.digital');
         }
 
-        $data = $surat->delete();
         if ($data) {
             Alert::success('Berhasil', 'Surat Digital Berhasil Dihapus');
 

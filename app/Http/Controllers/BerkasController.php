@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteDataRequest;
 use App\Models\Classification;
 use App\Models\Filelist;
 use Illuminate\Support\Facades\DB;
@@ -51,9 +52,9 @@ class BerkasController extends Controller
         return redirect()->route('surat.berkas');
     }
 
-    public function hapus($id)
+    public function hapus(DeleteDataRequest $request, $id)
     {
-        $result = DB::transaction(function () use ($id) {
+        $result = DB::transaction(function () use ($id, $request) {
             $filelist = Filelist::lockForUpdate()->find($id);
             if (! $filelist) {
                 return 'not_found';
@@ -67,7 +68,10 @@ class BerkasController extends Controller
                 return 'used';
             }
 
-            return $filelist->delete() ? 'deleted' : 'failed';
+            return $filelist->deleteWithAudit(
+                $request->user(),
+                $request->deletionReason()
+            ) ? 'deleted' : 'failed';
         });
 
         if ($result === 'not_found') {

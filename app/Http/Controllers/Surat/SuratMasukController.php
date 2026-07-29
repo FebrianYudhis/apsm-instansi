@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Surat;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeleteDataRequest;
 use App\Models\Access;
 use App\Models\Filelist;
 use App\Models\Incoming;
@@ -130,7 +131,7 @@ class SuratMasukController extends Controller
         return redirect()->route('surat.masuk');
     }
 
-    public function hapus($id)
+    public function hapus(DeleteDataRequest $request, $id)
     {
         $surat = Incoming::find($id);
         if (! $surat) {
@@ -152,8 +153,11 @@ class SuratMasukController extends Controller
         }
 
         $currentFilelistId = $surat->filelist_id;
+        $deletedBy = $request->user();
+        $deletionReason = $request->deletionReason();
+
         try {
-            $deleted = DB::transaction(function () use ($id, $currentFilelistId) {
+            $deleted = DB::transaction(function () use ($id, $currentFilelistId, $deletedBy, $deletionReason) {
                 $filelists = app(FilelistMutationLock::class)->lock($currentFilelistId, null);
                 $lockedSurat = Incoming::lockForUpdate()->find($id);
 
@@ -169,7 +173,8 @@ class SuratMasukController extends Controller
                     $lockedSurat->setRelation('filelist', $filelists->get($currentFilelistId));
                 }
 
-                return ! $lockedSurat->isAlihMediaLocked() && $lockedSurat->delete();
+                return ! $lockedSurat->isAlihMediaLocked()
+                    && $lockedSurat->deleteWithAudit($deletedBy, $deletionReason);
             });
         } catch (ValidationException $exception) {
             $deleted = false;

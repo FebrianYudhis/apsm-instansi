@@ -97,7 +97,7 @@
                                 <th>Waktu Kejadian</th>
                                 <th>Pelaku (User)</th>
                                 <th>Deskripsi (Aksi)</th>
-                                <th>Bagian (Model)</th>
+                                <th>Bagian Data</th>
                                 <th>Perubahan Data</th>
                             </tr>
                         </thead>

@@ -168,7 +168,9 @@ class SuratSafetyTest extends TestCase
             'items' => ['masuk:'.$surat->id],
         ])->assertRedirect();
 
-        $this->delete(route('masuk.hapus', $surat->id))
+        $this->delete(route('masuk.hapus', $surat->id), [
+            'alasan_penghapusan' => 'Memverifikasi surat terkunci tidak dapat dihapus',
+        ])
             ->assertRedirect(route('surat.masuk'));
 
         $surat->refresh();
@@ -453,7 +455,9 @@ class SuratSafetyTest extends TestCase
             'password_status_berkas' => $this->currentOtp(),
         ])->assertRedirect(route('surat.berkas'));
 
-        $this->delete(route('berkas.hapus', $this->filelist->id))
+        $this->delete(route('berkas.hapus', $this->filelist->id), [
+            'alasan_penghapusan' => 'Memverifikasi berkas terkunci tidak dapat dihapus',
+        ])
             ->assertRedirect(route('surat.berkas'));
 
         $this->filelist->refresh();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteDataRequest;
 use App\Models\Classification;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -65,9 +66,9 @@ class KlasifikasiController extends Controller
         }
     }
 
-    public function hapus($id)
+    public function hapus(DeleteDataRequest $request, $id)
     {
-        $result = DB::transaction(function () use ($id) {
+        $result = DB::transaction(function () use ($id, $request) {
             $klasifikasi = Classification::lockForUpdate()->find($id);
 
             if (! $klasifikasi) {
@@ -78,7 +79,10 @@ class KlasifikasiController extends Controller
                 return 'used';
             }
 
-            return $klasifikasi->delete() ? 'deleted' : 'failed';
+            return $klasifikasi->deleteWithAudit(
+                $request->user(),
+                $request->deletionReason()
+            ) ? 'deleted' : 'failed';
         }, 3);
 
         if ($result === 'not_found') {

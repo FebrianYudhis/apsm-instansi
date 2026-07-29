@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\AuditsDeletion;
 use App\Services\DocumentService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Incoming extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use AuditsDeletion, HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'nomor_agenda',

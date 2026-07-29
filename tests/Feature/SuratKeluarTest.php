@@ -189,7 +189,9 @@ class SuratKeluarTest extends TestCase
             'jenis' => 1,
         ]))->assertRedirect(route('surat.keluar'));
 
-        $this->delete(route('keluar.hapus', $surat->id))
+        $this->delete(route('keluar.hapus', $surat->id), [
+            'alasan_penghapusan' => 'Memverifikasi surat terkunci tidak dapat dihapus',
+        ])
             ->assertRedirect(route('surat.keluar'));
 
         $surat->refresh();

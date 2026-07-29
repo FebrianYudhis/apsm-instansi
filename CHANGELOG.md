@@ -4,6 +4,32 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-07-29
+
+### Added
+
+- Audit penghapusan untuk surat masuk, surat keluar, dokumen digital, klasifikasi, dan berkas melalui kolom `deleted_by_user_id` serta `deletion_reason`.
+- Relasi pelaku penghapusan dan metadata log yang menyimpan ID pengguna, nama pengguna, serta alasan penghapusan.
+- Form konfirmasi penghapusan bersama dengan input alasan yang wajib diisi sepanjang 5 hingga 1000 karakter.
+- Pengujian fitur untuk validasi alasan, pencatatan pelaku, metadata penghapusan, serta penyajian Log Aktivitas.
+
+### Changed
+
+- Seluruh proses penghapusan data kini mencatat pengguna yang melakukan penghapusan dan alasan yang diberikan.
+- Metadata khusus penghapusan disimpan di dalam `properties.attributes` agar struktur daftar Log Aktivitas tetap umum.
+- Kolom Deskripsi pada Log Aktivitas kini menggunakan badge berwarna dengan istilah Bahasa Indonesia.
+- Kolom Bagian Data pada Log Aktivitas kini menampilkan nama yang mudah dipahami, seperti Surat Masuk, Surat Keluar, Surat Digital, Klasifikasi, Berkas, Autentikasi, dan Ekspor Data.
+- Contoh nilai `APP_PENCIPTA_ARSIP` diperbarui menjadi Stasiun Meteorologi Kelas II H. Asan.
+
+### Fixed
+
+- Menyembunyikan tombol Data Sekarang pada aktivitas penghapusan karena data terkait sudah tidak tersedia pada daftar aktif.
+
+### Security
+
+- Atribut audit penghapusan tidak dapat diisi melalui mass assignment dan hanya dicatat melalui alur penghapusan terkontrol.
+- Foreign key pelaku penghapusan menggunakan pembatasan penghapusan pengguna untuk menjaga keutuhan riwayat audit.
+
 ## [0.4.0] - 2026-07-28
 
 ### Added

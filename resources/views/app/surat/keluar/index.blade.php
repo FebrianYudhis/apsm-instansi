@@ -205,24 +205,7 @@
         });
     </script>
 
-    <script>
-        $('#datatabel').on("click", ".konfirmasi-hapus", function (event) {
-            var form = $(this).closest("form");
-            event.preventDefault();
-            Swal.fire({
-                title: `Hapus`,
-                text: "Apakah Anda Yakin Ingin Menghapus ?",
-                icon: "warning",
-                showCancelButton: true,
-            })
-                .then((willDelete) => {
-                    if (willDelete.isConfirmed) {
-                        form.submit();
-                    }
-                });
-        });
-    </script>
-
+    <script src="{{ asset('js/delete-confirmation.js') }}"></script>
 @endpush
 
 @section('konten')

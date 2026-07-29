@@ -232,7 +232,9 @@ class BerkasIntegrityRegressionTest extends TestCase
 
     public function test_classification_with_an_active_filelist_cannot_be_deleted()
     {
-        $this->delete(route('klasifikasi.hapus', $this->classification->id))
+        $this->delete(route('klasifikasi.hapus', $this->classification->id), [
+            'alasan_penghapusan' => 'Memverifikasi klasifikasi terpakai tidak dapat dihapus',
+        ])
             ->assertRedirect(route('surat.klasifikasi'));
 
         $this->assertNull($this->classification->fresh()->deleted_at);
