@@ -50,6 +50,7 @@
                 const kodeKlasifikasi = activeParams.get('kode_klasifikasi');
                 const statusId = activeParams.get('status_id');
                 const keteranganAkhir = activeParams.get('keterangan_akhir');
+                const isi = activeParams.get('isi');
                 const tanggalDari = activeParams.get('tanggal_dari');
                 const tanggalSampai = activeParams.get('tanggal_sampai');
 
@@ -57,6 +58,7 @@
                 if (kodeKlasifikasi) params.set('kode_klasifikasi', kodeKlasifikasi);
                 if (statusId) params.set('status_id', statusId);
                 if (keteranganAkhir) params.set('keterangan_akhir', keteranganAkhir);
+                if (isi) params.set('isi', isi);
                 if (tanggalDari) params.set('tanggal_dari', tanggalDari);
                 if (tanggalSampai) params.set('tanggal_sampai', tanggalSampai);
 
@@ -133,6 +135,7 @@
                         d.kode_klasifikasi = $('#filterKlasifikasi').val();
                         d.status_id = $('#filterStatus').val();
                         d.keterangan_akhir = $('#filterKeteranganAkhir').val();
+                        d.isi = new URLSearchParams(window.location.search).get('isi');
                         d.tanggal_dari = $('#filterTanggalDari').val();
                         d.tanggal_sampai = $('#filterTanggalSampai').val();
                     }
@@ -207,6 +210,14 @@
                 $('#filterKeteranganAkhir').val('').trigger('change');
                 $('#filterTanggalDari').val('');
                 $('#filterTanggalSampai').val('');
+                const params = new URLSearchParams(window.location.search);
+                params.delete('isi');
+                const query = params.toString();
+                window.history.replaceState(
+                    {},
+                    '',
+                    query ? `${window.location.pathname}?${query}` : window.location.pathname
+                );
                 syncFilterToUrl();
                 updateExportUrl();
                 table.ajax.reload();
@@ -255,6 +266,14 @@
                 <h5 class="mb-0">Daftar Berkas</h5>
             </div>
             <div class="card-body">
+                @if (request('isi') === 'kosong')
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                        <span>Menampilkan hanya berkas yang belum memiliki isi.</span>
+                        <a href="{{ route('surat.berkas') }}" class="btn btn-sm btn-outline-dark">
+                            Hapus Filter
+                        </a>
+                    </div>
+                @endif
                 <div class="alert alert-info">
                     Total Berkas: <strong id="totalBerkas">0</strong>
                     <span class="ml-2">(Total Keseluruhan: <strong id="totalBerkasAll">0</strong>)</span>

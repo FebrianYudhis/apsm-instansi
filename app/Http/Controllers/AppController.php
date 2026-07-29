@@ -125,6 +125,7 @@ class AppController extends Controller
     public function berkas(Request $request)
     {
         $request->validate([
+            'isi' => ['nullable', 'in:kosong'],
             'tanggal_dari' => ['nullable', 'date'],
             'tanggal_sampai' => ['nullable', 'date', 'after_or_equal:tanggal_dari'],
         ]);
@@ -177,6 +178,10 @@ class AppController extends Controller
                 $query->where('filelists.keterangan_akhir', $keteranganAkhir);
             }
 
+            if ($request->input('isi') === 'kosong') {
+                $query->withoutContents();
+            }
+
             $isFilterItem = $request->filled('tanggal_dari') || $request->filled('tanggal_sampai');
 
             if ($isFilterItem) {
@@ -225,6 +230,7 @@ class AppController extends Controller
                         'kode_klasifikasi' => $request->input('kode_klasifikasi'),
                         'status_id' => $request->input('status_id'),
                         'keterangan_akhir' => $request->input('keterangan_akhir'),
+                        'isi' => $request->input('isi'),
                         'tanggal_dari' => $request->input('tanggal_dari'),
                         'tanggal_sampai' => $request->input('tanggal_sampai'),
                     ], function ($value) {

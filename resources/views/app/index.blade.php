@@ -111,7 +111,7 @@
                     </div>
 
                     <div class="home-attention-grid">
-                        <a href="{{ route('surat.berkas') }}" class="home-attention-item">
+                        <a href="{{ route('surat.belum-diberkaskan') }}" class="home-attention-item">
                             <span class="home-attention-icon is-warning">
                                 <i class="fa fa-folder-open" aria-hidden="true"></i>
                             </span>
@@ -122,7 +122,7 @@
                             <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </a>
 
-                        <a href="{{ route('surat.berkas') }}" class="home-attention-item">
+                        <a href="{{ route('surat.berkas', ['isi' => 'kosong']) }}" class="home-attention-item">
                             <span class="home-attention-icon is-info">
                                 <i class="fa fa-folder" aria-hidden="true"></i>
                             </span>

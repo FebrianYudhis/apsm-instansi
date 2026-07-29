@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Incoming;
+use App\Models\Outcoming;
 use App\Services\ActiveYear;
 use App\Services\DocumentService;
 use App\Services\SuratFilterQuery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
 class SuratListController extends Controller
@@ -48,6 +51,52 @@ class SuratListController extends Controller
 
         return DataTables::of($query)
             ->addColumn('aksi', fn ($data) => $this->suratActions($data, 'keluar'))
+            ->rawColumns(['aksi'])
+            ->toJson();
+    }
+
+    public function belumDiberkaskan(Request $request)
+    {
+        if (! $request->ajax()) {
+            return view('app.surat.belum-diberkaskan', [
+                'judul' => 'Surat Belum Diberkaskan',
+            ]);
+        }
+
+        $tahun = $this->activeYear->current();
+        $suratMasuk = Incoming::query()
+            ->selectRaw(
+                "id, 'masuk' as jenis, tanggal_diterima as tanggal_pencatatan, ".
+                'tanggal_surat, nomor_surat, pengirim as pihak, perihal'
+            )
+            ->where('tahun', $tahun)
+            ->pendingFiling();
+        $suratKeluar = Outcoming::query()
+            ->selectRaw(
+                "id, 'keluar' as jenis, tanggal_surat as tanggal_pencatatan, ".
+                'tanggal_surat, nomor_surat, tujuan as pihak, perihal'
+            )
+            ->where('tahun', $tahun)
+            ->pendingFiling();
+        $query = DB::query()->fromSub(
+            $suratMasuk->unionAll($suratKeluar),
+            'surat_belum_diberkaskan'
+        );
+
+        return DataTables::of($query)
+            ->addColumn('aksi', function ($data): string {
+                $jenis = (string) $data->jenis;
+                $editRoute = $jenis === 'masuk' ? 'masuk.edit' : 'keluar.edit';
+
+                return "<div class='d-flex justify-content-center'>"
+                    ."<a href='".e(route('surat.detailItem', [$jenis, $data->id]))
+                    ."' class='btn btn-info btn-sm mr-1' title='Lihat Detail'>"
+                    ."<i class='fa fa-eye'></i></a>"
+                    ."<a href='".e(route($editRoute, [$data->id]))
+                    ."' class='btn btn-primary btn-sm' title='Berkaskan Surat'>"
+                    ."<i class='fa fa-folder-plus'></i></a>"
+                    .'</div>';
+            })
             ->rawColumns(['aksi'])
             ->toJson();
     }

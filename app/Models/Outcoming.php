@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\AuditsDeletion;
 use App\Services\DocumentService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -48,6 +49,13 @@ class Outcoming extends Model
     public function access()
     {
         return $this->belongsTo(Access::class);
+    }
+
+    public function scopePendingFiling(Builder $query): Builder
+    {
+        return $query
+            ->whereNull('filelist_id')
+            ->where('is_srikandi', false);
     }
 
     public function isPubliclyAccessible(): bool

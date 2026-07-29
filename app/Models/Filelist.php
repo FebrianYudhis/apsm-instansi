@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\AuditsDeletion;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -61,6 +62,13 @@ class Filelist extends Model
     public function alihMediaStatus()
     {
         return $this->belongsTo(AlihMediaStatus::class);
+    }
+
+    public function scopeWithoutContents(Builder $query): Builder
+    {
+        return $query
+            ->whereDoesntHave('incomings')
+            ->whereDoesntHave('outcomings');
     }
 
     public function isAlihMediaLocked(): bool

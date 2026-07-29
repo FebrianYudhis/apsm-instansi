@@ -50,6 +50,8 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
         ->name('pindah-tahun')->whereNumber('tahun');
 
     Route::get('app', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('surat/belum-diberkaskan', [SuratListController::class, 'belumDiberkaskan'])
+        ->name('surat.belum-diberkaskan');
     Route::get('surat/masuk', [SuratListController::class, 'masuk'])->name('surat.masuk');
     Route::get('surat/masuk/export/pencatatan', [SuratMasukController::class, 'exportPencatatanExcel'])->name('surat.masuk.export-pencatatan');
     Route::get('surat/keluar', [SuratListController::class, 'keluar'])->name('surat.keluar');

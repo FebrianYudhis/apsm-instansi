@@ -45,11 +45,9 @@ class DashboardController extends Controller
                 ->where('alih_media_status_id', Filelist::ALIH_MEDIA_FAILED)->count(),
             'alihMediaSelesai' => Filelist::where('keterangan_akhir', 'Permanen')
                 ->where('alih_media_status_id', Filelist::ALIH_MEDIA_CLOSED)->count(),
-            'suratBelumBerkas' => (clone $suratMasuk)->whereNull('filelist_id')
-                ->where('is_srikandi', false)->count()
-                + (clone $suratKeluar)->whereNull('filelist_id')
-                    ->where('is_srikandi', false)->count(),
-            'berkasTanpaIsi' => Filelist::doesntHave('incomings')->doesntHave('outcomings')->count(),
+            'suratBelumBerkas' => (clone $suratMasuk)->pendingFiling()->count()
+                + (clone $suratKeluar)->pendingFiling()->count(),
+            'berkasTanpaIsi' => Filelist::withoutContents()->count(),
             'suratMasukTerbaru' => (clone $suratMasuk)->orderByDesc('tanggal_diterima')
                 ->orderByDesc('nomor_agenda')->limit(5)->get(),
             'suratKeluarTerbaru' => (clone $suratKeluar)->orderByDesc('tanggal_surat')

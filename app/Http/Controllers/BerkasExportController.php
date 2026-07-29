@@ -52,10 +52,12 @@ class BerkasExportController extends Controller
     ) {
         $kodeKlasifikasi = $request->input('kode_klasifikasi');
         $keteranganAkhir = $request->input('keterangan_akhir');
+        $isi = $request->input('isi');
         $tanggalDari = $request->input('tanggal_dari');
         $tanggalSampai = $request->input('tanggal_sampai');
 
         $request->validate([
+            'isi' => ['nullable', 'in:kosong'],
             'tanggal_dari' => ['nullable', 'date'],
             'tanggal_sampai' => ['nullable', 'date', 'after_or_equal:tanggal_dari'],
         ]);
@@ -127,6 +129,10 @@ class BerkasExportController extends Controller
 
         if (in_array($keteranganAkhir, ['Permanen', 'Musnah'], true)) {
             $query->where('filelists.keterangan_akhir', $keteranganAkhir);
+        }
+
+        if ($isi === 'kosong') {
+            $query->withoutContents();
         }
 
         $isFilterItem = $request->filled('tanggal_dari') || $request->filled('tanggal_sampai');
@@ -542,6 +548,7 @@ class BerkasExportController extends Controller
                 'status_id' => $hasStatusFilter ? $statusId : null,
                 'kode_klasifikasi' => $kodeKlasifikasi,
                 'keterangan_akhir' => $keteranganAkhir,
+                'isi' => $isi,
                 'tanggal_dari' => $tanggalDari,
                 'tanggal_sampai' => $tanggalSampai,
             ],

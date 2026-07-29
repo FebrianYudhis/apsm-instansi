@@ -4,6 +4,23 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 2026-07-29
+
+### Added
+
+- Menambahkan halaman khusus yang menggabungkan surat masuk dan surat keluar non-SRIKANDI pada tahun aktif yang belum diberkaskan.
+- Menambahkan pengujian regresi untuk tautan prioritas dashboard, cakupan tahun aktif, pengecualian surat SRIKANDI dan surat yang sudah diberkaskan, serta filter dan export berkas tanpa isi.
+
+### Changed
+
+- Tautan **Surat belum diberkaskan** pada dashboard kini membuka daftar surat yang sesuai dan menyediakan aksi untuk melihat detail atau langsung melakukan pemberkasan.
+- Tautan **Berkas belum memiliki isi** kini membawa filter `isi=kosong` ke daftar berkas, menampilkan indikator filter aktif, dan mempertahankan filter tersebut pada export.
+- Perhitungan dashboard dan halaman tujuan kini menggunakan scope query yang sama agar jumlah ringkasan tetap konsisten dengan data yang ditampilkan.
+
+### Fixed
+
+- Memperbaiki tautan prioritas dashboard yang sebelumnya tetap menampilkan daftar berkas umum tanpa menyaring data sesuai jenis temuan.
+
 ## [0.6.1] - 2026-07-29
 
 ### Added
