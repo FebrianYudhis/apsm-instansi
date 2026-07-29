@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Services\ActiveYear;
+use App\Services\DocumentService;
 use App\Services\SuratFilterQuery;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
 class SuratListController extends Controller
 {
-    public function __construct(private ActiveYear $activeYear) {}
+    public function __construct(
+        private ActiveYear $activeYear,
+        private DocumentService $documents
+    ) {}
 
     public function masuk(Request $request, SuratFilterQuery $suratFilter)
     {
@@ -56,11 +60,11 @@ class SuratListController extends Controller
         $button .= "<a href='".e(route('surat.detailItem', [$jenis, $data->id]))."' class='btn btn-info btn-sm mr-1' title='Lihat Detail'><i class='fa fa-eye'></i></a>";
 
         if ($data->url_watermarked || $data->url) {
-            $button .= "<a href='".e(route('document.admin', [
-                'jenis' => $jenis,
-                'id' => $data->id,
-                'versi' => 'tampil',
-            ]))."' target='_blank' rel='noopener noreferrer' class='btn btn-success btn-sm mr-1' title='Lihat Berkas (PDF)'><i class='fa fa-file-pdf'></i></a>";
+            $button .= "<a href='".e($this->documents->adminUrl(
+                $jenis,
+                $data,
+                DocumentService::VARIANT_DISPLAY
+            ))."' target='_blank' rel='noopener noreferrer' class='btn btn-success btn-sm mr-1' title='Lihat Berkas (PDF)'><i class='fa fa-file-pdf'></i></a>";
         }
 
         if ($data->isAlihMediaLocked()) {

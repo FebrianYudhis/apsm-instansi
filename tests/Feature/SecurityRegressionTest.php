@@ -101,6 +101,7 @@ class SecurityRegressionTest extends TestCase
             'tanggal_surat' => '2025-01-01',
             'perihal' => 'Surat Tahun Lama',
             'url' => 'dokumen/masuk/lama.pdf',
+            'url_watermarked' => 'dokumen/alih-media/lama.pdf',
             'tahun' => 2025,
             'is_srikandi' => false,
             'access_id' => $access->id,
@@ -109,7 +110,11 @@ class SecurityRegressionTest extends TestCase
         $this->withActiveYear(2026)->actingAs($user)->from('/app')
             ->get(route('surat.detailItem', ['masuk', $surat->id]))
             ->assertOk()
-            ->assertViewHas('requiresYearSwitch', true);
+            ->assertViewHas('requiresYearSwitch', true)
+            ->assertViewHas('documentFileName', 'surat-tahun-lama.pdf')
+            ->assertSee('surat-tahun-lama.pdf')
+            ->assertSee('wm-surat-tahun-lama.pdf')
+            ->assertDontSee('Tersimpan pada storage private');
     }
 
     public function test_filelist_date_filters_reject_an_inverted_range()

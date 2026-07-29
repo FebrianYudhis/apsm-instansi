@@ -353,8 +353,8 @@
                             <div class="detail-value">
                                 @if ($surat->url)
                                     <div class="d-flex align-items-center">
-                                        <span class="pdf-path-text">Tersimpan pada storage private</span>
-                                        <a href="{{ route('document.admin', ['jenis' => $jenis, 'id' => $surat->id, 'versi' => 'asli']) }}"
+                                        <span class="pdf-path-text">{{ $documentFileName }}</span>
+                                        <a href="{{ $documentOriginalUrl }}"
                                             target="_blank" rel="noopener noreferrer"
                                             class="btn btn-sm btn-success ml-2 py-1 px-2" style="font-size: 11px;">
                                             <i class="fa fa-external-link-alt"></i> Buka PDF
@@ -370,8 +370,8 @@
                             <div class="detail-value">
                                 @if ($surat->url_watermarked)
                                     <div class="d-flex align-items-center">
-                                        <span class="pdf-path-text">Tersimpan pada storage private</span>
-                                        <a href="{{ route('document.admin', ['jenis' => $jenis, 'id' => $surat->id, 'versi' => 'watermark']) }}"
+                                        <span class="pdf-path-text">wm-{{ $documentFileName }}</span>
+                                        <a href="{{ $documentWatermarkUrl }}"
                                             target="_blank" rel="noopener noreferrer"
                                             class="btn btn-sm btn-primary ml-2 py-1 px-2" style="font-size: 11px;">
                                             <i class="fa fa-external-link-alt"></i> Buka PDF Watermark

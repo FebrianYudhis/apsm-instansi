@@ -9,13 +9,17 @@ use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
 use App\Services\ActiveYear;
+use App\Services\DocumentService;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Yajra\DataTables\DataTables;
 
 class AppController extends Controller
 {
-    public function __construct(private ActiveYear $activeYear) {}
+    public function __construct(
+        private ActiveYear $activeYear,
+        private DocumentService $documents
+    ) {}
 
     public function digital(Request $request)
     {
@@ -26,11 +30,11 @@ class AppController extends Controller
                 ->addColumn('aksi', function ($data) {
                     $button = "<div class='d-flex justify-content-center'>";
                     if (! empty($data['url'])) {
-                        $button .= "<a href='".e(route('document.admin', [
-                            'jenis' => 'digital',
-                            'id' => $data['id'],
-                            'versi' => 'asli',
-                        ]))."' target='_blank' rel='noopener noreferrer' class='btn btn-success btn-sm mr-1' title='Lihat Berkas (PDF)'><i class='fa fa-file-pdf'></i></a>";
+                        $button .= "<a href='".e($this->documents->adminUrl(
+                            DocumentService::TYPE_DIGITAL,
+                            $data,
+                            DocumentService::VARIANT_ORIGINAL
+                        ))."' target='_blank' rel='noopener noreferrer' class='btn btn-success btn-sm mr-1' title='Lihat Berkas (PDF)'><i class='fa fa-file-pdf'></i></a>";
                     }
                     $button .= "<a href='".e(route('digital.edit', [$data['id']]))."' class='btn btn-primary btn-sm mr-1' title='Edit'><i class='fa fa-edit'></i></a>";
                     $button .= "<form action='".e(route('digital.hapus', [$data['id']]))."' class='m-0 konfirmasi-hapus' method='POST'> ".csrf_field().method_field('delete')." <button type='submit' class='btn btn-danger btn-sm' title='Hapus'><i class='fa fa-trash'></i></button></form>";
@@ -101,6 +105,17 @@ class AppController extends Controller
             'surat' => $surat,
             'editUrl' => $editRoute,
             'editPath' => $editPath,
+            'documentFileName' => $this->documents->descriptiveFileName($surat),
+            'documentOriginalUrl' => $this->documents->adminUrl(
+                $jenis,
+                $surat,
+                DocumentService::VARIANT_ORIGINAL
+            ),
+            'documentWatermarkUrl' => $this->documents->adminUrl(
+                $jenis,
+                $surat,
+                DocumentService::VARIANT_WATERMARK
+            ),
             'requiresYearSwitch' => (int) $surat->tahun !== $this->activeYear->current(),
         ];
 

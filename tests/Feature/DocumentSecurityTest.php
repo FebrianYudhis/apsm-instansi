@@ -7,9 +7,11 @@ use App\Models\Digital;
 use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\User;
+use App\Services\DocumentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use PragmaRX\Google2FA\Google2FA;
@@ -81,6 +83,66 @@ class DocumentSecurityTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_document_response_uses_a_short_subject_and_opened_at_timestamp_as_filename()
+    {
+        Date::setTestNow('2026-07-29 10:05:01');
+
+        try {
+            $document = $this->makeIncoming([
+                'perihal' => 'Undangan Rapat Koordinasi Evaluasi Kinerja Bulanan Instansi',
+                'access_id' => $this->publicAccess->id,
+                'url' => 'dokumen/masuk/nama-unduhan.pdf',
+            ]);
+            Storage::disk('documents')->put($document->url, $this->pdfContent());
+
+            $this->get(route('document.public', [
+                'jenis' => 'masuk',
+                'id' => $document->id,
+            ]))
+                ->assertOk()
+                ->assertHeader(
+                    'Content-Disposition',
+                    'inline; filename=undangan-rapat-koordinasi-evaluasi-kinerja-bulanan-29072026100501.pdf'
+                );
+        } finally {
+            Date::setTestNow();
+        }
+    }
+
+    public function test_document_urls_use_descriptive_names_for_pdf_viewer_titles()
+    {
+        $document = $this->makeIncoming([
+            'perihal' => 'Undangan Rapat Koordinasi Evaluasi Kinerja Bulanan Instansi',
+            'url_watermarked' => 'dokumen/alih-media/nama-watermark.pdf',
+        ]);
+        $documents = app(DocumentService::class);
+
+        $this->assertStringEndsWith(
+            '/asli/undangan-rapat-koordinasi-evaluasi-kinerja-bulanan.pdf',
+            $documents->adminUrl(
+                DocumentService::TYPE_INCOMING,
+                $document,
+                DocumentService::VARIANT_ORIGINAL
+            )
+        );
+        $this->assertStringEndsWith(
+            '/watermark/wm-undangan-rapat-koordinasi-evaluasi-kinerja-bulanan.pdf',
+            $documents->adminUrl(
+                DocumentService::TYPE_INCOMING,
+                $document,
+                DocumentService::VARIANT_WATERMARK
+            )
+        );
+        $this->assertStringEndsWith(
+            '/tampil/wm-undangan-rapat-koordinasi-evaluasi-kinerja-bulanan.pdf',
+            $documents->adminUrl(DocumentService::TYPE_INCOMING, $document)
+        );
+        $this->assertStringEndsWith(
+            '/wm-undangan-rapat-koordinasi-evaluasi-kinerja-bulanan.pdf',
+            $documents->publicUrl(DocumentService::TYPE_INCOMING, $document)
+        );
+    }
+
     public function test_authenticated_route_serves_restricted_document_but_rejects_unsafe_path()
     {
         $user = User::factory()->create();
@@ -100,11 +162,21 @@ class DocumentSecurityTest extends TestCase
             'versi' => 'asli',
         ]))->assertRedirect(route('login'));
 
-        $this->actingAs($user)->get(route('document.admin', [
+        $legacyUrl = route('document.admin', [
             'jenis' => 'masuk',
             'id' => $restricted->id,
             'versi' => 'asli',
-        ]))->assertOk();
+        ]);
+        $canonicalUrl = app(DocumentService::class)->adminUrl(
+            DocumentService::TYPE_INCOMING,
+            $restricted,
+            DocumentService::VARIANT_ORIGINAL
+        );
+
+        $this->actingAs($user)->get($legacyUrl)
+            ->assertRedirect($canonicalUrl);
+        $this->actingAs($user)->get($canonicalUrl)
+            ->assertOk();
 
         $this->actingAs($user)->get(route('document.admin', [
             'jenis' => 'masuk',
@@ -174,6 +246,10 @@ class DocumentSecurityTest extends TestCase
             'jenis' => 'masuk',
             'id' => $public->id,
         ]))->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/^inline; filename=wm-dokumen-\d{14}\.pdf$/',
+            (string) $publicResponse->headers->get('Content-Disposition')
+        );
         $this->assertSame(
             $watermarkedContent,
             file_get_contents($publicResponse->baseResponse->getFile()->getPathname())
@@ -185,6 +261,10 @@ class DocumentSecurityTest extends TestCase
             'password' => $this->currentOtp(),
         ])->assertOk()
             ->assertJsonPath('isSuccess', true);
+        $this->assertStringEndsWith(
+            '/wm-dokumen.pdf',
+            (string) parse_url($mfaResponse->json('url'), PHP_URL_PATH)
+        );
 
         $restrictedResponse = $this->get($mfaResponse->json('url'))->assertOk();
         $this->assertSame(
@@ -235,10 +315,13 @@ class DocumentSecurityTest extends TestCase
         $response = $this->get(route('guest.masuk', ['pencarian' => 'SEARCH-PUBLIC']), [
             'X-Requested-With' => 'XMLHttpRequest',
         ])->assertOk()
-            ->assertJsonPath('data.0.document_url', route('document.public', [
-                'jenis' => 'masuk',
-                'id' => $public->id,
-            ]));
+            ->assertJsonPath(
+                'data.0.document_url',
+                app(DocumentService::class)->publicUrl(
+                    DocumentService::TYPE_INCOMING,
+                    $public
+                )
+            );
 
         $json = $response->json('data.0');
         $this->assertArrayNotHasKey('url', $json);

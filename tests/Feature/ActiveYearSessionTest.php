@@ -53,7 +53,16 @@ test('the active year session controls dashboard data and newly stored letters',
         ->assertOk()
         ->assertDontSee('js/concept.js')
         ->assertViewHas('tahun', 2025)
-        ->assertViewHas('suratMasuk', 0);
+        ->assertViewHas('suratMasuk', 0)
+        ->assertSee('Pusat Kendali Arsip')
+        ->assertSee('Ringkasan tahun 2025')
+        ->assertSee('Kondisi arsip saat ini')
+        ->assertSee('Perlu perhatian')
+        ->assertSee('Status alih media')
+        ->assertSee('Akses cepat')
+        ->assertSee('Naskah yang baru dicatat')
+        ->assertDontSee('Catat Surat')
+        ->assertDontSee('Kelola Berkas');
 
     $this->post(route('masuk.tambah'), [
         'isSrikandi' => 0,

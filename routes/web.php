@@ -30,12 +30,13 @@ Route::get('/', [LoginController::class, 'showLoginForm']);
 Auth::routes(['register' => false, 'reset' => false]);
 
 Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
-    Route::get('dokumen/{jenis}/{id}/{versi?}', [DocumentController::class, 'admin'])
+    Route::get('dokumen/{jenis}/{id}/{versi?}/{nama?}', [DocumentController::class, 'admin'])
         ->name('document.admin')
         ->where([
             'jenis' => 'masuk|keluar|digital',
             'id' => '[0-9]+',
             'versi' => 'tampil|asli|watermark',
+            'nama' => '[A-Za-z0-9-]+\.pdf',
         ]);
 
     Route::get('log-aktivitas', [ActivityLogController::class, 'index'])->name('activity-log');
@@ -108,14 +109,22 @@ Route::get('guest', [GuestController::class, 'index'])->name('guest');
 Route::get('guest/masuk', [GuestController::class, 'masuk'])->name('guest.masuk');
 Route::get('guest/keluar', [GuestController::class, 'keluar'])->name('guest.keluar');
 Route::get('guest/digital', [GuestController::class, 'digital'])->name('guest.digital');
-Route::get('guest/dokumen/{jenis}/{id}', [DocumentController::class, 'public'])
+Route::get('guest/dokumen/{jenis}/{id}/{nama?}', [DocumentController::class, 'public'])
     ->middleware('throttle:guest-documents')
     ->name('document.public')
-    ->where(['jenis' => 'masuk|keluar|digital', 'id' => '[0-9]+']);
-Route::get('guest/dokumen-terbatas/{jenis}/{id}', [DocumentController::class, 'temporary'])
+    ->where([
+        'jenis' => 'masuk|keluar|digital',
+        'id' => '[0-9]+',
+        'nama' => '[A-Za-z0-9-]+\.pdf',
+    ]);
+Route::get('guest/dokumen-terbatas/{jenis}/{id}/{nama?}', [DocumentController::class, 'temporary'])
     ->middleware(['signed', 'throttle:guest-documents'])
     ->name('document.temporary')
-    ->where(['jenis' => 'masuk|keluar', 'id' => '[0-9]+']);
+    ->where([
+        'jenis' => 'masuk|keluar',
+        'id' => '[0-9]+',
+        'nama' => '[A-Za-z0-9-]+\.pdf',
+    ]);
 Route::post('guest/buka/', [GuestController::class, 'bukaSurat'])
     ->middleware('throttle:guest-document-mfa')
     ->name('guest.buka');

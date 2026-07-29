@@ -10,6 +10,7 @@ use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
 use App\Models\User;
+use App\Services\DocumentService;
 use Database\Seeders\AlihMediaStatusSeeder;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\QueryException;
@@ -108,10 +109,13 @@ class SuratSafetyTest extends TestCase
             ->assertJsonPath('data.0.id', $public->id)
             ->assertJsonPath('data.0.requires_mfa', false)
             ->assertJsonPath('data.0.access_state', 'public')
-            ->assertJsonPath('data.0.document_url', route('document.public', [
-                'jenis' => 'masuk',
-                'id' => $public->id,
-            ]));
+            ->assertJsonPath(
+                'data.0.document_url',
+                app(DocumentService::class)->publicUrl(
+                    DocumentService::TYPE_INCOMING,
+                    $public
+                )
+            );
         $this->assertArrayNotHasKey('url', $publicResponse->json('data.0'));
 
         $restrictedOutcomingResponse = $this->get(route('guest.keluar', ['pencarian' => 'GUEST-OUT-RESTRICTED']), [

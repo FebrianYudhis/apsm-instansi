@@ -8,9 +8,11 @@ use App\Models\Outcoming;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Throwable;
 
 class DocumentService
@@ -26,6 +28,8 @@ class DocumentService
     public const VARIANT_ORIGINAL = 'asli';
 
     public const VARIANT_WATERMARK = 'watermark';
+
+    private const DOWNLOAD_SUBJECT_WORD_LIMIT = 6;
 
     private const MODELS = [
         self::TYPE_INCOMING => Incoming::class,
@@ -153,6 +157,10 @@ class DocumentService
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'SAMEORIGIN',
         ]);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $this->downloadFileName($document, $variant)
+        );
 
         $response->setPrivate();
         $response->setMaxAge(0);
@@ -162,12 +170,52 @@ class DocumentService
         return $response;
     }
 
+    public function descriptiveFileName(
+        Model $document,
+        string $variant = self::VARIANT_ORIGINAL
+    ): string {
+        return $this->fileNamePrefix($document, $variant)
+            .$this->subjectFileName($document).'.pdf';
+    }
+
+    private function downloadFileName(Model $document, string $variant): string
+    {
+        return $this->fileNamePrefix($document, $variant)
+            .$this->subjectFileName($document)
+            .'-'.now()->format('dmYHis').'.pdf';
+    }
+
+    private function fileNamePrefix(Model $document, string $variant): string
+    {
+        $usesWatermark = $variant === self::VARIANT_WATERMARK
+            || ($variant === self::VARIANT_DISPLAY && ! empty($document->url_watermarked));
+
+        return $usesWatermark ? 'wm-' : '';
+    }
+
+    private function subjectFileName(Model $document): string
+    {
+        $words = preg_split(
+            '/\s+/u',
+            trim((string) ($document->perihal ?? '')),
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        ) ?: [];
+        $subject = Str::slug(
+            implode(' ', array_slice($words, 0, self::DOWNLOAD_SUBJECT_WORD_LIMIT)),
+            '-'
+        );
+
+        return $subject ?: 'dokumen';
+    }
+
     public function adminUrl(string $type, Model $document, string $variant = self::VARIANT_DISPLAY): string
     {
         return route('document.admin', [
             'jenis' => $type,
             'id' => $document->getKey(),
             'versi' => $variant,
+            'nama' => $this->descriptiveFileName($document, $variant),
         ]);
     }
 
@@ -176,6 +224,7 @@ class DocumentService
         return route('document.public', [
             'jenis' => $type,
             'id' => $document->getKey(),
+            'nama' => $this->descriptiveFileName($document, self::VARIANT_DISPLAY),
         ]);
     }
 

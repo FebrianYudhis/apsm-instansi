@@ -14,15 +14,27 @@ class DocumentController extends Controller
         $this->documents = $documents;
     }
 
-    public function admin(string $jenis, int $id, string $versi = DocumentService::VARIANT_DISPLAY)
-    {
+    public function admin(
+        string $jenis,
+        int $id,
+        string $versi = DocumentService::VARIANT_DISPLAY,
+        ?string $nama = null
+    ) {
         $document = $this->documents->find($jenis, $id);
         abort_unless($document, 404);
+        abort_if($this->documents->path($jenis, $document, $versi) === null, 404);
+
+        $expectedName = $this->documents->descriptiveFileName($document, $versi);
+        if ($nama !== $expectedName) {
+            return redirect()->to(
+                $this->documents->adminUrl($jenis, $document, $versi)
+            );
+        }
 
         return $this->documents->response($jenis, $document, $versi);
     }
 
-    public function public(string $jenis, int $id)
+    public function public(string $jenis, int $id, ?string $nama = null)
     {
         $document = $this->documents->find($jenis, $id);
         abort_unless($document, 404);
@@ -31,7 +43,7 @@ class DocumentController extends Controller
         return $this->documents->response($jenis, $document);
     }
 
-    public function temporary(Request $request, string $jenis, int $id)
+    public function temporary(Request $request, string $jenis, int $id, ?string $nama = null)
     {
         $document = $this->documents->find($jenis, $id);
         abort_unless($document, 404);

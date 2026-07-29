@@ -4,6 +4,35 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-07-29
+
+### Added
+
+- Menambahkan nama file PDF deskriptif yang dibentuk dari maksimal enam kata pertama perihal.
+- Menambahkan nama file sebagai segmen URL dokumen admin, publik, dan tautan sementara MFA agar judul tab PDF mudah dikenali.
+- Menambahkan pengujian regresi untuk nama file, prefix watermark, URL dokumen, redirect URL lama, dan bagian operasional dashboard.
+
+### Changed
+
+- Nama file ketika PDF dibuka atau diunduh kini menggunakan potongan perihal dengan pemisah tanda hubung serta timestamp waktu dibuka dalam format `ddMMyyyyHHmmss`.
+- Dokumen watermark kini menggunakan prefix `wm-` pada nama tampilan, judul tab, dan nama file respons.
+- Detail surat kini menampilkan nama file PDF asli dan watermark sebagai pengganti keterangan penyimpanan internal.
+- Tautan PDF pada daftar surat, detail surat, surat digital, portal publik, dan akses MFA kini menggunakan URL deskriptif yang konsisten.
+- Dashboard didesain ulang menjadi pusat kendali arsip dengan hero tahun aktif, kartu statistik interaktif, prioritas pekerjaan, alur status alih media, akses cepat, retensi akhir, dan daftar surat terbaru.
+- Tata letak dashboard kini responsif untuk desktop dan perangkat seluler dengan hierarki informasi, jarak, warna status, serta kondisi kosong yang lebih jelas.
+- CSS tema dashboard diperbarui dan varian minified disinkronkan tanpa menambah dependency frontend baru.
+
+### Fixed
+
+- Memperbaiki judul tab PDF pada area pengguna yang sebelumnya dapat tampil sebagai `asli`, `tampil`, atau `watermark`.
+- URL dokumen admin lama tanpa nama file kini otomatis diarahkan ke URL deskriptif, termasuk ketika tautan berasal dari halaman yang masih tersimpan di cache.
+- Memperbaiki karakter pemisah metadata surat terbaru yang sebelumnya dapat tampil sebagai karakter rusak.
+
+### Security
+
+- Redirect URL dokumen lama tetap memvalidasi jenis, path, dan keberadaan referensi dokumen sebelum menghasilkan URL kanonis.
+- Akses dokumen publik, dokumen terbatas bertanda tangan, dan dokumen private tetap menggunakan pemeriksaan otorisasi serta pembatasan storage yang sudah berlaku.
+
 ## [0.5.1] - 2026-07-29
 
 ### Added

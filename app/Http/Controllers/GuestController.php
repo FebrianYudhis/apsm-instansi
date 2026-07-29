@@ -242,7 +242,14 @@ class GuestController extends Controller
             'url' => URL::temporarySignedRoute(
                 'document.temporary',
                 $expiresAt,
-                ['jenis' => $data['jenis'], 'id' => (int) $data['id']]
+                [
+                    'jenis' => $data['jenis'],
+                    'id' => (int) $data['id'],
+                    'nama' => $this->documents->descriptiveFileName(
+                        $surat,
+                        DocumentService::VARIANT_DISPLAY
+                    ),
+                ]
             ),
             'expires_at' => $expiresAt->toIso8601String(),
         ]);
