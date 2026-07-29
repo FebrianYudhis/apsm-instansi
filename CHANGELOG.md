@@ -4,6 +4,24 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-07-29
+
+### Added
+
+- Menambahkan pengujian regresi untuk memastikan tombol **Data Sekarang** hanya tersedia selama data terkait masih aktif.
+- Menambahkan pengujian aset frontend untuk memastikan seluruh referensi CSS dan JavaScript lokal menggunakan berkas minified yang tersedia.
+
+### Changed
+
+- Mengganti `slimScroll` dengan scrolling native browser pada sidebar.
+- Menghapus pemuatan `concept.js` karena tidak lagi memiliki fungsi aktif.
+- Menggunakan varian `.min.css` dan `.min.js` untuk aset frontend lokal pada layout dan halaman daftar, sehingga ukuran aset hasil transformasi berkurang sekitar 32%.
+
+### Fixed
+
+- Memperbaiki error JavaScript `slimScroll is not a function` yang muncul pada hampir seluruh halaman admin.
+- Menyembunyikan tombol **Data Sekarang** dari seluruh riwayat lama ketika data terkait sudah dihapus, sekaligus mempertahankannya untuk data yang masih aktif.
+
 ## [0.5.0] - 2026-07-29
 
 ### Added

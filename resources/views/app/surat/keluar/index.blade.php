@@ -205,7 +205,7 @@
         });
     </script>
 
-    <script src="{{ asset('js/delete-confirmation.js') }}"></script>
+    <script src="{{ asset('js/delete-confirmation.min.js') }}"></script>
 @endpush
 
 @section('konten')

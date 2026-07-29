@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{ $judul }}</title>
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/circular/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/concept.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/apsm-theme.css') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/fontawesome/css/fontawesome-all.css') }}">
+    <link rel="stylesheet" href="{{ asset('fonts/circular/style.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/concept.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/apsm-theme.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('fonts/fontawesome/css/fontawesome-all.min.css') }}">
     <style>
         html,
         body {

@@ -222,7 +222,7 @@
         });
     </script>
 
-    <script src="{{ asset('js/delete-confirmation.js') }}"></script>
+    <script src="{{ asset('js/delete-confirmation.min.js') }}"></script>
 
     <script>
         $('#datatabel').on("click", ".konfirmasi-pindah", function(event) {

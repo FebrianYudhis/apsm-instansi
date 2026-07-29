@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Portal arsip publik {{ config('app.pencipta_arsip') }}">
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/circular/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/fontawesome/css/fontawesome-all.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/guest-portal.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/mfa-code-input.css') }}">
+    <link rel="stylesheet" href="{{ asset('fonts/circular/style.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('fonts/fontawesome/css/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/guest-portal.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/mfa-code-input.min.css') }}">
     @stack('css')
     <title>{{ $judul }} — Portal Arsip Publik</title>
 </head>
@@ -75,7 +75,7 @@
 
     <script src="{{ asset('js/jquery-3.5.1.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/mfa-code-input.js') }}"></script>
+    <script src="{{ asset('js/mfa-code-input.min.js') }}"></script>
     @stack('js')
 </body>
 

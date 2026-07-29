@@ -126,7 +126,7 @@ test('log aktivitas menyimpan alasan penghapusan sebagai attribute detail', func
         ->and($createdActivity['description'])->toContain('badge-success')
         ->and($createdActivity['description'])->toContain('Data Dibuat')
         ->and($createdActivity['model'])->toBe('Surat Digital')
-        ->and($createdActivity['perubahan'])->toContain('title="Data Sekarang"')
+        ->and($createdActivity['perubahan'])->not->toContain('title="Data Sekarang"')
         ->and(data_get($deletedActivity, 'properties.attributes.deleted_by_name'))->toBe($user->name)
         ->and(data_get($deletedActivity, 'properties.attributes.deletion_reason'))->toBe($reason);
 });
@@ -171,13 +171,17 @@ test('log aktivitas menampilkan nama bagian dan badge aktivitas dalam bahasa Ind
 
     $loginActivity = $activities->firstWhere('log_name', 'auth');
     $exportActivity = $activities->firstWhere('event', 'exported');
+    $activeDigitalActivity = $activities
+        ->where('subject_type', Digital::class)
+        ->firstWhere('event', 'created');
 
     expect($loginActivity['description'])->toContain('badge-primary')
         ->and($loginActivity['description'])->toContain('Masuk ke Sistem')
         ->and($loginActivity['model'])->toBe('Autentikasi')
         ->and($exportActivity['description'])->toContain('badge-warning')
         ->and($exportActivity['description'])->toContain('Ekspor Disiapkan')
-        ->and($exportActivity['model'])->toBe('Ekspor Data');
+        ->and($exportActivity['model'])->toBe('Ekspor Data')
+        ->and($activeDigitalActivity['perubahan'])->toContain('title="Data Sekarang"');
 });
 
 function makeAuditableDeletionRecord(string $modelClass): Model

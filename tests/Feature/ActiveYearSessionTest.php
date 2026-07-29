@@ -51,6 +51,7 @@ test('the active year session controls dashboard data and newly stored letters',
 
     $this->get('/app')
         ->assertOk()
+        ->assertDontSee('js/concept.js')
         ->assertViewHas('tahun', 2025)
         ->assertViewHas('suratMasuk', 0);
 

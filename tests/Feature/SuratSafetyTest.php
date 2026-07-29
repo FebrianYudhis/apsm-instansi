@@ -128,9 +128,9 @@ class SuratSafetyTest extends TestCase
         $this->get(route('guest'))
             ->assertOk()
             ->assertSee('Portal Arsip Publik')
-            ->assertSee('guest-portal.css')
-            ->assertSee('mfa-code-input.css')
-            ->assertSee('mfa-code-input.js');
+            ->assertSee('guest-portal.min.css')
+            ->assertSee('mfa-code-input.min.css')
+            ->assertSee('mfa-code-input.min.js');
 
         $this->get(route('guest.masuk'))
             ->assertOk()
@@ -372,8 +372,8 @@ class SuratSafetyTest extends TestCase
             ->assertOk()
             ->assertSee('data:image/svg+xml;base64,', false)
             ->assertDontSee('api.qrserver.com', false)
-            ->assertSee('mfa-code-input.css')
-            ->assertSee('mfa-code-input.js');
+            ->assertSee('mfa-code-input.min.css')
+            ->assertSee('mfa-code-input.min.js');
     }
 
     public function test_authenticated_mfa_actions_require_exactly_six_numeric_digits()

@@ -312,9 +312,20 @@ table.dataTable tbody tr:hover {
     display: inline-block;
 }
 
+.nav-left-sidebar .menu-list {
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
 @media (max-width: 991.98px) {
     .nav-left-sidebar {
         box-shadow: none;
+    }
+
+    .nav-left-sidebar .menu-list {
+        max-height: none;
+        overflow-y: visible;
     }
 
     .dashboard-content {
