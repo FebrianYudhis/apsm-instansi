@@ -162,6 +162,8 @@ class GuestController extends Controller
             } else {
                 $suratDigital = Digital::where('perihal', 'LIKE', '%'.$data.'%')
                     ->select(['id', 'perihal', 'url'])
+                    ->orderBy('perihal')
+                    ->orderBy('id')
                     ->paginate(self::SEARCH_PAGE_SIZE);
                 $suratDigital->setCollection(
                     $suratDigital->getCollection()->transform(
@@ -173,7 +175,9 @@ class GuestController extends Controller
             }
         }
 
-        $suratDigital = Digital::paginate(10);
+        $suratDigital = Digital::orderBy('perihal')
+            ->orderBy('id')
+            ->paginate(10);
         $suratDigital->getCollection()->transform(
             fn ($item) => $this->prepareGuestDigital($item)
         );

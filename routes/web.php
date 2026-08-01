@@ -78,7 +78,12 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
     Route::get('surat/klasifikasi', [AppController::class, 'klasifikasi'])->name('surat.klasifikasi');
     Route::get('surat/klasifikasi/export/excel', [KlasifikasiExportController::class, 'exportExcel'])->name('surat.klasifikasi.export');
     Route::get('surat/berkas', [AppController::class, 'berkas'])->name('surat.berkas');
-    Route::get('surat/detail-item/{jenis}/{idSurat}', [AppController::class, 'detailItem'])->name('surat.detailItem');
+    Route::get('surat/detail-item/{jenis}/{idSurat}', [AppController::class, 'detailItem'])
+        ->where([
+            'jenis' => 'masuk|keluar|digital',
+            'idSurat' => '[0-9]+',
+        ])
+        ->name('surat.detailItem');
     Route::get('surat/berkas/export/excel', [BerkasExportController::class, 'exportBerkasExcel'])->name('surat.berkas.export');
     Route::get('surat/alih-media/penyeleksian', [AppController::class, 'alihMediaPenyeleksian'])->name('alih-media.penyeleksian');
     Route::get('surat/alih-media/diproses', [AppController::class, 'alihMediaDiproses'])->name('alih-media.diproses');
@@ -113,11 +118,18 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
     Route::post('surat/klasifikasi/edit/{id}', [KlasifikasiController::class, 'update']);
     Route::delete('surat/klasifikasi/hapus/{id}', [KlasifikasiController::class, 'hapus'])->name('klasifikasi.hapus');
 
-    Route::get('surat/berkas/buka/{id}', [BerkasContentController::class, 'buka'])->name('berkas.buka');
+    Route::get('surat/berkas/buka/{id}', [BerkasContentController::class, 'buka'])
+        ->whereNumber('id')
+        ->name('berkas.buka');
     Route::get('surat/berkas/aktif/list', [BerkasContentController::class, 'daftarBerkasAktif'])->name('berkas.aktif.list');
-    Route::post('surat/berkas/keluarkan/{idBerkas}/{jenis}/{idSurat}', [BerkasContentController::class, 'keluarkan'])->name('berkas.keluarkan');
+    Route::post('surat/berkas/keluarkan/{idBerkas}/{jenis}/{idSurat}', [BerkasContentController::class, 'keluarkan'])
+        ->whereNumber('idBerkas')
+        ->whereNumber('idSurat')
+        ->name('berkas.keluarkan');
     Route::post('surat/berkas/ganti-lokasi-bulk', [BerkasContentController::class, 'gantiLokasiBulk'])->name('berkas.gantiLokasiBulk');
-    Route::post('surat/berkas/pindah/{id}/{status}', [BerkasStatusController::class, 'pindah'])->name('berkas.pindah');
+    Route::post('surat/berkas/pindah/{id}/{status}', [BerkasStatusController::class, 'pindah'])
+        ->whereNumber('id')
+        ->name('berkas.pindah');
     Route::get('surat/berkas/tambah', [BerkasController::class, 'tambah'])->name('berkas.tambah');
     Route::post('surat/berkas/tambah', [BerkasController::class, 'store']);
     Route::get('surat/berkas/edit/{id}', [BerkasController::class, 'edit'])->name('berkas.edit');

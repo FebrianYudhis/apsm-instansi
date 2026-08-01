@@ -80,6 +80,8 @@ class AppController extends Controller
             $surat = Incoming::with(['filelist.classification', 'access'])->find($idSurat);
         } elseif ($jenis == 'keluar') {
             $surat = Outcoming::with(['filelist.classification', 'access'])->find($idSurat);
+        } elseif ($jenis == 'digital') {
+            $surat = Digital::find($idSurat);
         } else {
             Alert::error('Gagal', 'Jenis Surat Tidak Valid');
 
@@ -92,31 +94,33 @@ class AppController extends Controller
             return redirect()->back();
         }
 
-        $editRoute = $jenis == 'masuk'
-            ? route('masuk.edit', [$surat->id])
-            : route('keluar.edit', [$surat->id]);
-        $editPath = $jenis == 'masuk'
-            ? route('masuk.edit', [$surat->id], false)
-            : route('keluar.edit', [$surat->id], false);
+        $editRouteName = match ($jenis) {
+            'masuk' => 'masuk.edit',
+            'keluar' => 'keluar.edit',
+            'digital' => 'digital.edit',
+        };
 
         $data = [
             'judul' => 'Detail Naskah',
             'jenis' => $jenis,
             'surat' => $surat,
-            'editUrl' => $editRoute,
-            'editPath' => $editPath,
+            'editUrl' => route($editRouteName, [$surat->id]),
+            'editPath' => route($editRouteName, [$surat->id], false),
             'documentFileName' => $this->documents->descriptiveFileName($surat),
             'documentOriginalUrl' => $this->documents->adminUrl(
                 $jenis,
                 $surat,
                 DocumentService::VARIANT_ORIGINAL
             ),
-            'documentWatermarkUrl' => $this->documents->adminUrl(
-                $jenis,
-                $surat,
-                DocumentService::VARIANT_WATERMARK
-            ),
-            'requiresYearSwitch' => (int) $surat->tahun !== $this->activeYear->current(),
+            'documentWatermarkUrl' => $jenis === DocumentService::TYPE_DIGITAL
+                ? null
+                : $this->documents->adminUrl(
+                    $jenis,
+                    $surat,
+                    DocumentService::VARIANT_WATERMARK
+                ),
+            'requiresYearSwitch' => $jenis !== DocumentService::TYPE_DIGITAL
+                && (int) $surat->tahun !== $this->activeYear->current(),
         ];
 
         return view('app.surat.detail-item', $data);

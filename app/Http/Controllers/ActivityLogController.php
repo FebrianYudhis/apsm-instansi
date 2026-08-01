@@ -57,7 +57,7 @@ class ActivityLogController extends Controller
                         } elseif ($data->subject_type === 'App\Models\Outcoming' && $data->subject_id) {
                             $buttons .= '<a href="'.route('surat.detailItem', ['keluar', $data->subject_id]).'" target="_blank" class="btn btn-sm btn-success" title="Data Sekarang"><i class="fa fa-eye"></i></a>';
                         } elseif ($data->subject_type === 'App\Models\Digital' && $data->subject_id) {
-                            $buttons .= '<a href="'.route('digital.edit', $data->subject_id).'" target="_blank" class="btn btn-sm btn-success" title="Data Sekarang"><i class="fa fa-eye"></i></a>';
+                            $buttons .= '<a href="'.route('surat.detailItem', ['digital', $data->subject_id]).'" target="_blank" class="btn btn-sm btn-success" title="Data Sekarang"><i class="fa fa-eye"></i></a>';
                         }
                     }
 

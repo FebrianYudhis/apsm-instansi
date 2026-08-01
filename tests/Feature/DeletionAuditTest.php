@@ -184,6 +184,62 @@ test('log aktivitas menampilkan nama bagian dan badge aktivitas dalam bahasa Ind
         ->and($activeDigitalActivity['perubahan'])->toContain('title="Data Sekarang"');
 });
 
+test('tombol data sekarang surat digital membuka detail item dan bukan halaman edit', function () {
+    $user = User::factory()->create();
+    $digital = Digital::create([
+        'perihal' => 'Dokumen Digital untuk Detail Log',
+        'url' => 'dokumen/digital/detail-log.pdf',
+    ]);
+
+    $this->actingAs($user);
+
+    $activity = collect($this->get(route('activity-log', ['length' => 100]), [
+        'X-Requested-With' => 'XMLHttpRequest',
+    ])->assertOk()->json('data'))
+        ->where('subject_type', Digital::class)
+        ->firstWhere('event', 'created');
+
+    expect($activity['perubahan'])
+        ->toContain(route('surat.detailItem', ['digital', $digital->id]))
+        ->not->toContain(route('digital.edit', $digital->id));
+
+    $this->get(route('surat.detailItem', ['digital', $digital->id]))
+        ->assertOk()
+        ->assertViewIs('app.surat.detail-item')
+        ->assertViewHas('jenis', 'digital')
+        ->assertViewHas('requiresYearSwitch', false)
+        ->assertSee('Surat Digital')
+        ->assertSee('Dokumen Digital untuk Detail Log')
+        ->assertDontSee('class="nomor-surat"', false)
+        ->assertDontSee('Kearsipan')
+        ->assertDontSee('Dokumen Watermark');
+});
+
+test('detail surat hanya menampilkan nomor dan perihal sekali di header', function () {
+    $user = User::factory()->create();
+    $incoming = Incoming::create([
+        'nomor_agenda' => 102,
+        'tanggal_diterima' => '2026-08-01',
+        'nomor_surat' => 'IN/DETAIL/UNIK/001',
+        'pengirim' => 'Pengirim Detail',
+        'tanggal_surat' => '2026-07-31',
+        'perihal' => 'Perihal Detail yang Tidak Berulang',
+        'url' => 'dokumen/masuk/detail-unik.pdf',
+        'tahun' => 2026,
+        'is_srikandi' => false,
+    ]);
+
+    $response = $this->withActiveYear(2026)
+        ->actingAs($user)
+        ->get(route('surat.detailItem', ['masuk', $incoming->id]))
+        ->assertOk()
+        ->assertDontSee('class="detail-label">Nomor Surat</div>', false)
+        ->assertDontSee('class="detail-label">Perihal</div>', false);
+
+    expect(substr_count($response->getContent(), $incoming->nomor_surat))->toBe(1)
+        ->and(substr_count($response->getContent(), $incoming->perihal))->toBe(1);
+});
+
 function makeAuditableDeletionRecord(string $modelClass): Model
 {
     return match ($modelClass) {

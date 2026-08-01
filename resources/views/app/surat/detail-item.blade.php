@@ -178,8 +178,18 @@
 @section('konten')
     @php
         $isMasuk = $jenis === 'masuk';
-        $title = $isMasuk ? 'Surat Masuk' : 'Surat Keluar';
-        $isAlihMediaLocked = $surat->isAlihMediaLocked();
+        $isDigital = $jenis === 'digital';
+        $title = match ($jenis) {
+            'masuk' => 'Surat Masuk',
+            'keluar' => 'Surat Keluar',
+            'digital' => 'Surat Digital',
+        };
+        $headerIcon = match ($jenis) {
+            'masuk' => 'fa-inbox',
+            'keluar' => 'fa-paper-plane',
+            'digital' => 'fa-file-alt',
+        };
+        $isAlihMediaLocked = !$isDigital && $surat->isAlihMediaLocked();
     @endphp
 
     <div class="row mt-3">
@@ -192,15 +202,17 @@
                         <div>
                             <div class="mb-2">
                                 <span class="badge-jenis">
-                                    <i class="fa {{ $isMasuk ? 'fa-inbox' : 'fa-paper-plane' }}"></i>
+                                    <i class="fa {{ $headerIcon }}"></i>
                                     {{ $title }}
                                 </span>
                             </div>
                             <h5>{{ $surat->perihal ?? '-' }}</h5>
-                            <div class="nomor-surat">
-                                <i class="fa fa-hashtag" style="font-size: 11px;"></i>
-                                {{ $surat->nomor_surat ?? '-' }}
-                            </div>
+                            @unless ($isDigital)
+                                <div class="nomor-surat">
+                                    <i class="fa fa-hashtag" style="font-size: 11px;"></i>
+                                    {{ $surat->nomor_surat ?? '-' }}
+                                </div>
+                            @endunless
                         </div>
                         <div class="detail-actions">
                             @if ($isAlihMediaLocked)
@@ -228,7 +240,7 @@
                 </div>
 
                 {{-- Alert tahun berbeda --}}
-                @if (!$isAlihMediaLocked && $surat->tahun != $activeYear)
+                @if (!$isDigital && !$isAlihMediaLocked && $surat->tahun != $activeYear)
                     <div class="alert alert-info mb-0" style="border-radius: 0; border-left: 0; border-right: 0;">
                         <i class="fa fa-info-circle mr-1"></i>
                         Tahun aktif saat ini <strong>{{ $activeYear }}</strong>. Tombol edit akan memindahkan tahun ke <strong>{{ $surat->tahun }}</strong> terlebih dahulu.
@@ -244,33 +256,28 @@
                         <div class="detail-item">
                             <div class="detail-label">Jenis Surat</div>
                             <div class="detail-value">
-                                <span class="detail-badge {{ $isMasuk ? 'detail-badge-masuk' : 'detail-badge-keluar' }}">
-                                    <i class="fa {{ $isMasuk ? 'fa-inbox' : 'fa-paper-plane' }}"></i>
+                                <span class="detail-badge {{ $isMasuk ? 'detail-badge-masuk' : ($isDigital ? 'detail-badge-digital' : 'detail-badge-keluar') }}">
+                                    <i class="fa {{ $headerIcon }}"></i>
                                     {{ $title }}
                                 </span>
                             </div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Tahun</div>
-                            <div class="detail-value">{{ $surat->tahun ?? '-' }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Nomor Surat</div>
-                            <div class="detail-value">{{ $surat->nomor_surat ?? '-' }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Tanggal Surat</div>
-                            <div class="detail-value">{{ $surat->tanggal_surat ?? '-' }}</div>
-                        </div>
-                        <div class="detail-item full-width">
-                            <div class="detail-label">Perihal</div>
-                            <div class="detail-value">{{ $surat->perihal ?? '-' }}</div>
-                        </div>
+                        @unless ($isDigital)
+                            <div class="detail-item">
+                                <div class="detail-label">Tahun</div>
+                                <div class="detail-value">{{ $surat->tahun ?? '-' }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Tanggal Surat</div>
+                                <div class="detail-value">{{ $surat->tanggal_surat ?? '-' }}</div>
+                            </div>
+                        @endunless
                     </div>
                 </div>
 
                 {{-- Section: Detail Spesifik --}}
-                <div class="detail-section" style="border-top: 1px solid var(--apsm-border);">
+                @unless ($isDigital)
+                    <div class="detail-section" style="border-top: 1px solid var(--apsm-border);">
                     <div class="detail-section-title">
                         <i class="fa fa-file-alt"></i>
                         {{ $isMasuk ? 'Detail Surat Masuk' : 'Detail Surat Keluar' }}
@@ -313,10 +320,10 @@
                             </div>
                         @endif
                     </div>
-                </div>
+                    </div>
 
-                {{-- Section: Kearsipan --}}
-                <div class="detail-section" style="border-top: 1px solid var(--apsm-border);">
+                    {{-- Section: Kearsipan --}}
+                    <div class="detail-section" style="border-top: 1px solid var(--apsm-border);">
                     <div class="detail-section-title">
                         <i class="fa fa-archive"></i> Kearsipan
                     </div>
@@ -340,7 +347,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                    </div>
+                @endunless
 
                 {{-- Section: Dokumen PDF --}}
                 <div class="detail-section" style="border-top: 1px solid var(--apsm-border);">
@@ -365,23 +373,25 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Dokumen Watermark</div>
-                            <div class="detail-value">
-                                @if ($surat->url_watermarked)
-                                    <div class="d-flex align-items-center">
-                                        <span class="pdf-path-text">wm-{{ $documentFileName }}</span>
-                                        <a href="{{ $documentWatermarkUrl }}"
-                                            target="_blank" rel="noopener noreferrer"
-                                            class="btn btn-sm btn-primary ml-2 py-1 px-2" style="font-size: 11px;">
-                                            <i class="fa fa-external-link-alt"></i> Buka PDF Watermark
-                                        </a>
-                                    </div>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
+                        @unless ($isDigital)
+                            <div class="detail-item">
+                                <div class="detail-label">Dokumen Watermark</div>
+                                <div class="detail-value">
+                                    @if ($surat->url_watermarked)
+                                        <div class="d-flex align-items-center">
+                                            <span class="pdf-path-text">wm-{{ $documentFileName }}</span>
+                                            <a href="{{ $documentWatermarkUrl }}"
+                                                target="_blank" rel="noopener noreferrer"
+                                                class="btn btn-sm btn-primary ml-2 py-1 px-2" style="font-size: 11px;">
+                                                <i class="fa fa-external-link-alt"></i> Buka PDF Watermark
+                                            </a>
+                                        </div>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @endunless
                     </div>
                 </div>
 

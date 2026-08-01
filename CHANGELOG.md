@@ -4,6 +4,25 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-08-01
+
+### Added
+
+- Menambahkan dukungan detail item untuk Surat Digital agar data aktif dapat dilihat tanpa membuka formulir edit.
+- Menambahkan pengujian regresi untuk tautan detail Surat Digital dari Log Aktivitas, penyajian header detail, pengurutan daftar publik, dan constraint numerik ID route berkas.
+
+### Changed
+
+- Tombol **Data Sekarang** pada Log Aktivitas Surat Digital kini membuka halaman detail item di tab baru.
+- Informasi Umum pada detail surat tidak lagi mengulang nomor surat dan perihal yang sudah tersedia di header.
+- Header detail Surat Digital hanya menampilkan jenis dan perihal tanpa nomor surat yang tidak berlaku.
+- Daftar awal dan hasil pencarian Surat Digital pada portal publik kini diurutkan berdasarkan perihal A–Z, kemudian berdasarkan ID ketika perihalnya sama.
+
+### Fixed
+
+- Memperbaiki tombol lihat data logging Surat Digital yang sebelumnya langsung membuka halaman edit.
+- Mencegah parameter ID non-numerik pada route buka berkas, keluarkan surat dari berkas, dan pindah status berkas mencapai controller serta menghasilkan `TypeError`; URL tersebut kini langsung menghasilkan respons `404`.
+
 ## [0.7.0] - 2026-07-29
 
 ### Added
