@@ -4,6 +4,25 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-08-10
+
+### Added
+
+- Menambahkan endpoint `GET /api/v1/berkas` untuk mengambil seluruh berkas non-deleted beserta klasifikasi, status, retensi, keterangan akhir, dan status alih media.
+- Menambahkan pengujian autentikasi, ability token, struktur respons, pengurutan, nilai kosong, serta pengecualian berkas yang sudah dihapus.
+
+### Changed
+
+- Pindah Tahun kini kembali ke halaman internal terakhir dan menggunakan dashboard sebagai fallback jika tujuan tidak tersedia atau tidak aman.
+- Panduan API pada halaman pengelolaan token kini mencantumkan endpoint detail seluruh berkas.
+- README disederhanakan menjadi panduan umum aplikasi, instalasi, konfigurasi, API, penyimpanan dokumen, dan pengembangan.
+
+### Security
+
+- Endpoint detail berkas tetap dilindungi Personal Access Token dengan ability `surat:create`, rate limiting, dan middleware API yang sudah berlaku.
+- Respons detail berkas hanya menyajikan field yang ditentukan dan tidak memuat metadata penghapusan, foreign key relasi, timestamp, atau data soft-deleted.
+- Redirect Pindah Tahun hanya menerima path internal yang aman untuk mencegah open redirect.
+
 ## [0.8.0] - 2026-08-01
 
 ### Added

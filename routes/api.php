@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthenticatedUserController;
+use App\Http\Controllers\Api\V1\FilelistController;
 use App\Http\Controllers\Api\V1\ReferenceDataController;
 use App\Http\Controllers\Api\V1\StoreIncomingController;
 use App\Http\Controllers\Api\V1\StoreOutgoingController;
@@ -22,6 +23,8 @@ Route::prefix('v1')
             ->name('api.v1.references.accesses');
         Route::get('referensi/berkas-aktif', [ReferenceDataController::class, 'activeFilelists'])
             ->name('api.v1.references.active-filelists');
+        Route::get('berkas', [FilelistController::class, 'index'])
+            ->name('api.v1.berkas.index');
         Route::post('surat/masuk', StoreIncomingController::class)
             ->name('api.v1.surat.masuk.store');
         Route::post('surat/keluar', StoreOutgoingController::class)

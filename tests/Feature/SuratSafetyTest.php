@@ -470,19 +470,22 @@ class SuratSafetyTest extends TestCase
         $this->assertNull($this->filelist->deleted_at);
     }
 
-    public function test_pindah_tahun_only_accepts_the_expected_internal_edit_path()
+    public function test_pindah_tahun_only_accepts_safe_internal_paths()
     {
         $this->actingAs($this->user);
         $maliciousRedirect = url('/').'@evil.example/surat/masuk/edit/1';
 
-        $this->from('/app')
-            ->post(route('pindah-tahun', ['tahun' => 2025]), [
-                'redirect_to' => $maliciousRedirect,
-            ])
-            ->assertRedirect(route('surat.masuk'));
+        $this->post(route('pindah-tahun', ['tahun' => 2025]), [
+            'redirect_to' => $maliciousRedirect,
+        ])->assertRedirect(route('dashboard'));
+
+        $dashboardPath = route('dashboard', absolute: false).'?bagian=surat-terbaru';
+        $this->post(route('pindah-tahun', ['tahun' => 2026]), [
+            'redirect_to' => $dashboardPath,
+        ])->assertRedirect($dashboardPath);
 
         $validPath = route('masuk.edit', 123, false);
-        $this->post(route('pindah-tahun', ['tahun' => 2026]), [
+        $this->post(route('pindah-tahun', ['tahun' => 2025]), [
             'redirect_to' => $validPath,
         ])->assertRedirect($validPath);
     }

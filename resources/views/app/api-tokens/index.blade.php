@@ -93,6 +93,8 @@ Accept: application/json</code></pre>
                         <dd class="col-sm-8"><code>GET {{ route('api.v1.references.accesses') }}</code></dd>
                         <dt class="col-sm-4">Berkas aktif</dt>
                         <dd class="col-sm-8"><code>GET {{ route('api.v1.references.active-filelists') }}</code></dd>
+                        <dt class="col-sm-4">Detail seluruh berkas</dt>
+                        <dd class="col-sm-8"><code>GET {{ route('api.v1.berkas.index') }}</code></dd>
                     </dl>
                     <button type="button" class="btn btn-outline-primary" data-toggle="modal"
                         data-target="#apiGuideModal">

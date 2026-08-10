@@ -71,9 +71,12 @@ class SecurityRegressionTest extends TestCase
         $user = User::factory()->create();
         $this->withActiveYear(2025)->actingAs($user);
 
+        $this->post(route('pindah-tahun', 2026))
+            ->assertRedirect(route('dashboard'));
+
         $this->post(route('pindah-tahun', 2026), [
             'redirect_to' => 'https://example.com/phishing',
-        ])->assertRedirect(route('surat.masuk'));
+        ])->assertRedirect(route('dashboard'));
 
         $this->assertSame(2026, session(ActiveYear::SESSION_KEY));
         $this->assertFalse(Schema::hasColumn('users', 'tahun'));
@@ -87,6 +90,17 @@ class SecurityRegressionTest extends TestCase
 
         $this->post(route('pindah-tahun', 2024))->assertNotFound();
         $this->assertSame(2025, session(ActiveYear::SESSION_KEY));
+    }
+
+    public function test_year_switch_form_submits_the_current_internal_path()
+    {
+        $user = User::factory()->create();
+
+        $this->withActiveYear(2025)
+            ->actingAs($user)
+            ->get('/app?bagian=surat-terbaru')
+            ->assertOk()
+            ->assertSee('name="redirect_to" value="/app?bagian=surat-terbaru"', false);
     }
 
     public function test_detail_item_can_view_a_different_year_without_granting_edit_access()

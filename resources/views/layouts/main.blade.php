@@ -117,6 +117,7 @@
                                             @foreach ($years as $year)
                                                 <form action="{{ route('pindah-tahun', $year) }}" method="POST">
                                                     @csrf
+                                                    <input type="hidden" name="redirect_to" value="{{ request()->getRequestUri() }}">
                                                     <button type="submit"
                                                         class="nav-link border-0 bg-transparent text-left w-100">{{ $year }}</button>
                                                 </form>

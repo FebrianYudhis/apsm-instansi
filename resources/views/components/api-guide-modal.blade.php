@@ -476,6 +476,8 @@
                     <code>GET {{ route('api.v1.references.accesses') }}</code> dan
                     <code>filelist_id</code> melalui
                     <code>GET {{ route('api.v1.references.active-filelists') }}</code>.
+                    Detail seluruh berkas tersedia melalui
+                    <code>GET {{ route('api.v1.berkas.index') }}</code>.
                 </div>
             </div>
 
