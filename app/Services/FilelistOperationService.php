@@ -14,6 +14,91 @@ class FilelistOperationService
      * @param  array<int, string>  $items
      * @return array{status: string, count?: int}
      */
+    public function attachLetters(
+        int $targetFilelistId,
+        array $items
+    ): array {
+        [$incomingIds, $outcomingIds] = $this->separateLetterIds($items);
+
+        if (count($incomingIds) + count($outcomingIds) !== count($items)) {
+            return ['status' => 'letter_invalid'];
+        }
+
+        return DB::transaction(function () use (
+            $targetFilelistId,
+            $incomingIds,
+            $outcomingIds
+        ): array {
+            $targetFilelist = Filelist::lockForUpdate()->find($targetFilelistId);
+
+            if (
+                ! $targetFilelist
+                || (int) $targetFilelist->status_id !== 1
+                || $targetFilelist->isAlihMediaLocked()
+            ) {
+                return ['status' => 'target_invalid'];
+            }
+
+            $incomingLetters = count($incomingIds) > 0
+                ? Incoming::withTrashed()
+                    ->whereIn('id', $incomingIds)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                : collect();
+            $outgoingLetters = count($outcomingIds) > 0
+                ? Outcoming::withTrashed()
+                    ->whereIn('id', $outcomingIds)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                : collect();
+
+            if (
+                $incomingLetters->count() !== count($incomingIds)
+                || $outgoingLetters->count() !== count($outcomingIds)
+            ) {
+                return ['status' => 'letter_invalid'];
+            }
+
+            $startYear = (int) config('app.start_year');
+            $currentYear = now()->year;
+            $hasInvalidLetter = $incomingLetters
+                ->concat($outgoingLetters)
+                ->contains(function ($letter) use ($startYear, $currentYear): bool {
+                    return $letter->trashed()
+                        || (int) $letter->tahun < $startYear
+                        || (int) $letter->tahun > $currentYear
+                        || $letter->filelist_id !== null
+                        || (bool) $letter->is_srikandi
+                        || $letter->url_watermarked !== null;
+                });
+
+            if ($hasInvalidLetter) {
+                return ['status' => 'letter_invalid'];
+            }
+
+            foreach ($incomingLetters as $letter) {
+                $letter->filelist_id = $targetFilelistId;
+                $letter->saveOrFail();
+            }
+
+            foreach ($outgoingLetters as $letter) {
+                $letter->filelist_id = $targetFilelistId;
+                $letter->saveOrFail();
+            }
+
+            return [
+                'status' => 'updated',
+                'count' => $incomingLetters->count() + $outgoingLetters->count(),
+            ];
+        });
+    }
+
+    /**
+     * @param  array<int, string>  $items
+     * @return array{status: string, count?: int}
+     */
     public function moveLetters(int $sourceFilelistId, int $targetFilelistId, array $items): array
     {
         [$incomingIds, $outcomingIds] = $this->separateLetterIds($items);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttachLettersRequest;
 use App\Models\Classification;
 use App\Models\Filelist;
 use App\Services\FilelistOperationService;
@@ -95,7 +96,34 @@ class BerkasContentController extends Controller
             'berkas' => $filelist,
             'kurunWaktu' => $kurunWaktu,
             'classification' => Classification::orderBy('kode_klasifikasi')->get(),
+            'years' => range(now()->year, (int) config('app.start_year')),
         ]);
+    }
+
+    public function lampirkanBulk(
+        AttachLettersRequest $request,
+        int $id,
+        FilelistOperationService $operations
+    ): RedirectResponse {
+        $validated = $request->validated();
+        $result = $operations->attachLetters(
+            $id,
+            $validated['items']
+        );
+
+        if ($result['status'] !== 'updated') {
+            $messages = [
+                'target_invalid' => 'Berkas tujuan tidak aktif atau sudah masuk proses alih media',
+                'letter_invalid' => 'Terdapat surat yang sudah berubah atau tidak dapat dilampirkan',
+            ];
+            Alert::error('Gagal', $messages[$result['status']] ?? 'Surat gagal dilampirkan');
+
+            return redirect()->route('berkas.buka', $id);
+        }
+
+        Alert::success('Berhasil', $result['count'].' surat berhasil dilampirkan');
+
+        return redirect()->route('berkas.buka', $id);
     }
 
     public function daftarBerkasAktif(): JsonResponse

@@ -2,10 +2,13 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
 @endpush
 
 @push('js')
     <script src="{{ asset('js/datatables.min.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/direct-filing.min.js') }}"></script>
 @endpush
 
 @push('js')
@@ -243,6 +246,8 @@
             ],
         ],
     ])
+
+    @include('components.direct-filing-modal')
 
     <div class="modal fade" id="modalFilterSuratMasuk" tabindex="-1"
         aria-labelledby="modalFilterSuratMasukLabel" aria-hidden="true">

@@ -4,6 +4,22 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-08-11
+
+### Added
+
+- Menambahkan fitur **Lampirkan Surat** pada halaman Buka Berkas untuk memilih surat masuk maupun surat keluar yang belum diberkaskan dari berbagai tahun, dengan tabel ringkas berisi Tanggal Surat, Nomor Surat, Pengirim/Tujuan, Perihal, dan Aksi.
+- Menambahkan daftar sementara **Surat Dipilih** yang mempertahankan pilihan ketika pengguna berpindah jenis surat, tahun, halaman tabel, atau melakukan pencarian; pilih-semua hanya berlaku pada halaman tabel yang sedang terlihat.
+- Menambahkan pratinjau PDF di tab baru pada daftar calon surat serta aksi **Berkaskan Surat** langsung dari halaman Surat Belum Diberkaskan, Daftar Surat Masuk, dan Daftar Surat Keluar melalui modal pencarian berkas aktif.
+- Menambahkan aksi **Keluarkan dari Berkas** pada setiap surat yang dapat dipindahkan di Daftar Isi Berkas, lengkap dengan konfirmasi sebelum surat dilepaskan dari pemberkasan.
+- Menambahkan komponen modal bersama, ikon dan ukuran tombol yang konsisten, aset JavaScript khusus dalam bentuk minified, serta pengujian fitur dan regresi untuk seluruh alur pemberkasan baru.
+
+### Security
+
+- Proses lampirkan dan keluarkan surat menggunakan transaksi database serta penguncian data untuk mencegah perubahan parsial ketika berkas atau surat berubah akibat permintaan lain.
+- Backend memvalidasi bahwa berkas tujuan masih aktif, belum dihapus, dan tidak berada dalam proses alih media, serta memastikan surat belum diberkaskan, bukan SRIKANDI, tidak dihapus, dan tidak memiliki watermark.
+- Perubahan relasi pemberkasan disimpan melalui Eloquent agar activity log setiap surat tetap tercatat.
+
 ## [0.9.1] - 2026-08-11
 
 ### Added

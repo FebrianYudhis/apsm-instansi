@@ -16,9 +16,11 @@ it('separates filelist responsibilities into focused controllers and services', 
         ->and(method_exists(BerkasController::class, 'keluarkan'))->toBeFalse()
         ->and(method_exists(BerkasController::class, 'pindah'))->toBeFalse()
         ->and(method_exists(BerkasContentController::class, 'gantiLokasiBulk'))->toBeTrue()
+        ->and(method_exists(BerkasContentController::class, 'lampirkanBulk'))->toBeTrue()
         ->and(method_exists(BerkasContentController::class, 'keluarkan'))->toBeTrue()
         ->and(method_exists(BerkasStatusController::class, 'pindah'))->toBeTrue()
-        ->and(class_exists(FilelistOperationService::class))->toBeTrue();
+        ->and(class_exists(FilelistOperationService::class))->toBeTrue()
+        ->and(method_exists(FilelistOperationService::class, 'attachLetters'))->toBeTrue();
 });
 
 it('keeps spreadsheet implementation outside incoming and outgoing controllers', function (

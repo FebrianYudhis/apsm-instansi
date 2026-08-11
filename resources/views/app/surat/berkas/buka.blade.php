@@ -8,148 +8,22 @@
 @push('js')
     <script src="{{ asset('js/datatables.min.js') }}"></script>
     <script src="{{ asset('js/select2.min.js') }}"></script>
-@endpush
-
-@push('js')
-    <script>
-        $(document).ready(function () {
-            const berkasAktifApiUrl = `{{ route('berkas.aktif.list') }}`;
-            const berkasAsalId = Number(`{{ $berkas['id'] }}`);
-            const datatable = $('#datatabel').DataTable({
-                scrollX: true,
-                autoWidth: false,
-                order: [[3, 'desc']],
-            });
-
-            $('#modalPemberkasan').select2({
-                width: '100%',
-                dropdownParent: $('#modalGantiLokasi'),
-                placeholder: '- Pilih Pemberkasan -'
-            });
-
-            $('#modalPemberkasanBulk').select2({
-                width: '100%',
-                dropdownParent: $('#modalBulkPindah'),
-                placeholder: '- Pilih Pemberkasan -'
-            });
-
-            function loadPemberkasanBulkOptions() {
-                const select = $('#modalPemberkasanBulk');
-                select.prop('disabled', true);
-                select.html('<option value="">Memuat data pemberkasan...</option>').trigger('change');
-
-                return $.ajax({
-                    url: berkasAktifApiUrl,
-                    method: 'GET',
-                    dataType: 'json'
-                }).done(function (response) {
-                    const items = response && Array.isArray(response.data) ? response.data : [];
-
-                    const availableItems = items.filter(function (item) {
-                        return Number(item.id) !== berkasAsalId;
-                    });
-
-                    select.empty().append(new Option('- Pilih Pemberkasan -', ''));
-                    availableItems.forEach(function (item) {
-                        select.append(new Option(
-                            String(item.kode_klasifikasi || '-') + ' - ' + String(item.nama_berkas || ''),
-                            String(item.id)
-                        ));
-                    });
-
-                    if (availableItems.length === 0) {
-                        select.empty().append(new Option('Tidak ada data pemberkasan aktif', ''));
-                    }
-
-                    select.prop('disabled', availableItems.length === 0);
-                    select.val('').trigger('change');
-                }).fail(function () {
-                    select.html('<option value="">Gagal memuat data</option>');
-                    select.prop('disabled', true);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: 'Data pemberkasan tujuan gagal dimuat dari server.'
-                    });
-                });
-            }
-
-            $('#modalKodeKlasifikasi').select2({
-                width: '100%',
-                dropdownParent: $('#modalEditBerkas'),
-                placeholder: '- Pilih Klasifikasi -'
-            });
-
-            function refreshBulkUiState() {
-                const total = datatable.$('.bulk-item').length;
-                const checked = datatable.$('.bulk-item:checked').length;
-                $('#bulkSelectedCount').text(checked);
-                $('#bulkSelectedCountModal').text(checked);
-                $('#btnOpenBulkModal').prop('disabled', checked === 0);
-                $('#bulkSelectAll').prop('checked', total > 0 && total === checked);
-            }
-
-            $('#bulkSelectAll').on('change', function () {
-                datatable.$('.bulk-item').prop('checked', $(this).is(':checked'));
-                refreshBulkUiState();
-            });
-
-            $('#datatabel tbody').on('change', '.bulk-item', function () {
-                refreshBulkUiState();
-            });
-
-            $('#btnOpenBulkModal').on('click', function () {
-                const selectedItems = datatable.$('.bulk-item:checked').map(function () {
-                    return $(this).val();
-                }).get();
-
-                const selectedContainer = $('#bulkSelectedContainer');
-                selectedContainer.empty();
-
-                selectedItems.forEach(function (value) {
-                    selectedContainer.append('<input type="hidden" name="items[]" value="' + value + '">');
-                });
-
-                $('#modalBulkPindah').modal('show');
-                loadPemberkasanBulkOptions();
-            });
-
-            $('#btnOpenEditBerkasModal').on('click', function () {
-                $('#modalEditBerkas').modal('show');
-            });
-
-            @if ($errors->has('kodeKlasifikasi') || $errors->has('namaBerkas') || $errors->has('retensiAktif') || $errors->has('retensiInaktif') || $errors->has('keteranganAkhir'))
-                $('#modalEditBerkas').modal('show');
-            @endif
-
-            $('#formBulkPindah').on('submit', function (event) {
-                event.preventDefault();
-                const form = this;
-
-                Swal.fire({
-                    title: 'Pindahkan surat terpilih?',
-                    text: 'Pastikan berkas tujuan sudah benar.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, pindahkan',
-                    cancelButtonText: 'Batal'
-                }).then(function (result) {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-
-            refreshBulkUiState();
-        });
-    </script>
+    <script src="{{ asset('js/berkas-buka.min.js') }}"></script>
 @endpush
 
 @section('konten')
     @php
-                    $canMoveItems = (int) $berkas['status_id'] === 1 && is_null($berkas['alih_media_status_id']);
+        $canMoveItems = (int) $berkas['status_id'] === 1 && is_null($berkas['alih_media_status_id']);
+        $hasEditErrors = $errors->has('kodeKlasifikasi') || $errors->has('namaBerkas') || $errors->has('retensiAktif') || $errors->has('retensiInaktif') || $errors->has('keteranganAkhir');
+        $hasAttachErrors = $errors->has('items') || $errors->has('items.*');
     @endphp
-    <div class="mt-4">
+    <div id="berkasBukaPage"
+        class="mt-4"
+        data-filelist-id="{{ $berkas['id'] }}"
+        data-active-filelists-url="{{ route('berkas.aktif.list') }}"
+        data-pending-letters-url="{{ route('surat.belum-diberkaskan') }}"
+        data-open-edit-modal="{{ $hasEditErrors ? '1' : '0' }}"
+        data-open-attach-modal="{{ $hasAttachErrors ? '1' : '0' }}">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -171,9 +45,15 @@
                 </div>
 
                 @if ($canMoveItems)
-                    <div class="mb-3 d-flex align-items-center">
-                        <button type="button" id="btnOpenBulkModal" class="btn btn-primary mr-2" disabled>
-                            Pindahkan Terpilih
+                    <div class="mb-3 d-flex flex-wrap align-items-center">
+                        <button type="button" id="btnOpenAttachModal"
+                            class="btn btn-success mr-2 mb-2 d-inline-flex align-items-center justify-content-center">
+                            <i class="fa fa-paperclip mr-1"></i> Lampirkan Surat
+                        </button>
+                        <button type="button" id="btnOpenBulkModal"
+                            class="btn btn-primary mr-2 mb-2 d-inline-flex align-items-center justify-content-center"
+                            disabled>
+                            <i class="fa fa-exchange-alt mr-1"></i> Pindahkan Terpilih
                         </button>
                         <span>Dipilih: <strong id="bulkSelectedCount">0</strong></span>
                     </div>
@@ -215,11 +95,23 @@
                                     <td>
                                         <div class="d-flex justify-content-center">
                                             <a href="{{ route('surat.detailItem', [$item['jenis'], $item['id']]) }}"
-                                                class="btn btn-info btn-sm"
+                                                class="btn btn-info btn-sm{{ $canMoveItems && !$item['is_locked'] ? ' mr-1' : '' }}"
                                                 target="_blank"
                                                 rel="noopener noreferrer" title="Lihat Detail">
                                                 <i class="fa fa-eye"></i>
                                             </a>
+                                            @if ($canMoveItems && !$item['is_locked'])
+                                                <form method="POST"
+                                                    action="{{ route('berkas.keluarkan', [$berkas['id'], $item['jenis'], $item['id']]) }}"
+                                                    class="m-0 detach-letter-form"
+                                                    data-letter-number="{{ $item['nomor_naskah'] }}">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        title="Keluarkan dari Berkas" aria-label="Keluarkan dari Berkas">
+                                                        <i class="fa fa-unlink"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -231,6 +123,136 @@
             </div>
         </div>
     </div>
+
+    @if ($canMoveItems)
+        <div class="modal fade" id="modalLampirkanSurat" tabindex="-1" aria-labelledby="modalLampirkanSuratLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <form id="formLampirkanSurat" method="POST" action="{{ route('berkas.lampirkanBulk', $berkas['id']) }}" autocomplete="off">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLampirkanSuratLabel">Lampirkan Surat ke Berkas</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            @if ($hasAttachErrors)
+                                <div class="alert alert-danger">
+                                    Data lampiran belum valid. Pilih kembali surat yang akan dilampirkan.
+                                </div>
+                            @endif
+
+                            <ul class="nav nav-tabs mb-3" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="attachSearchTab" data-toggle="tab" href="#attachSearchPane"
+                                        role="tab" aria-controls="attachSearchPane" aria-selected="true">
+                                        <i class="fa fa-search mr-1"></i> Cari Surat
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="attachSelectedTab" data-toggle="tab" href="#attachSelectedPane"
+                                        role="tab" aria-controls="attachSelectedPane" aria-selected="false">
+                                        <i class="fa fa-paperclip mr-1"></i> Surat Dipilih
+                                        <span class="badge badge-primary ml-1" id="attachSelectedMenuCount">0</span>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="attachSearchPane" role="tabpanel" aria-labelledby="attachSearchTab">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="attachJenis">Jenis Surat</label>
+                                                <select class="form-control" id="attachJenis">
+                                                    <option value="">- Pilih Jenis Surat -</option>
+                                                    <option value="masuk">Surat Masuk</option>
+                                                    <option value="keluar">Surat Keluar</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="attachTahun">Tahun</label>
+                                                <select class="form-control" id="attachTahun">
+                                                    <option value="">- Pilih Tahun -</option>
+                                                    @foreach ($years as $year)
+                                                        <option value="{{ $year }}">{{ $year }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="attachFilterHint" class="alert alert-info mb-0">
+                                        Pilih jenis surat dan tahun. Pilihan sebelumnya tetap tersimpan saat filter diganti.
+                                    </div>
+
+                                    <div id="attachTableContainer" class="d-none">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Dipilih sementara: <strong id="attachSelectedCount">0</strong> surat</span>
+                                            <span class="text-muted small">Pilih semua hanya berlaku untuk halaman tabel yang terlihat.</span>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table id="attachLettersTable" class="table table-bordered table-striped w-100">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th><input type="checkbox" id="attachSelectAll" aria-label="Pilih semua surat pada halaman ini"></th>
+                                                        <th>Tanggal Surat</th>
+                                                        <th>Nomor Surat</th>
+                                                        <th>Pengirim / Tujuan</th>
+                                                        <th>Perihal</th>
+                                                        <th class="text-center">Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="attachSelectedPane" role="tabpanel" aria-labelledby="attachSelectedTab">
+                                    <div id="attachSelectedEmpty" class="alert alert-secondary mb-0">
+                                        Belum ada surat yang dipilih. Pilih surat dari menu Cari Surat.
+                                    </div>
+                                    <div id="attachSelectedTableContainer" class="d-none">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong>Daftar sementara surat yang akan dilampirkan</strong>
+                                            <button type="button" id="btnClearAttachSelection" class="btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-times mr-1"></i> Bersihkan Pilihan
+                                            </button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Tanggal Surat</th>
+                                                        <th>Nomor Surat</th>
+                                                        <th>Pengirim / Tujuan</th>
+                                                        <th>Perihal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="attachSelectedTableBody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="attachSelectedContainer"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" id="btnAttachSelected" class="btn btn-success" disabled>
+                                Lampirkan Surat Terpilih
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="modal fade" id="modalBulkPindah" tabindex="-1" aria-labelledby="modalBulkPindahLabel" aria-hidden="true">
         <div class="modal-dialog">

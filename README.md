@@ -24,7 +24,7 @@ APSM menyediakan ruang kerja internal berdasarkan tahun aktif dan portal publik 
 ## Fitur utama
 
 - Pengelolaan surat masuk, surat keluar, surat digital, klasifikasi, dan berkas arsip.
-- Pemberkasan, retensi, perubahan status arsip, serta pencatatan lokasi simpan.
+- Pemberkasan langsung maupun massal lintas tahun dan jenis surat, retensi, perubahan status arsip, serta pencatatan lokasi simpan.
 - Dukungan surat SRIKANDI dan nomor agenda unik per tahun.
 - Dashboard statistik dan prioritas pekerjaan.
 - Portal pencarian arsip publik dengan akses dokumen terkontrol.
@@ -34,6 +34,14 @@ APSM menyediakan ruang kerja internal berdasarkan tahun aktif dan portal publik 
 - Activity log untuk autentikasi, perubahan data, penghapusan, dan ekspor.
 - API berbasis Laravel Sanctum untuk integrasi surat dan data referensi.
 - Audit integritas antara data aplikasi dan file dokumen.
+
+## Alur pemberkasan
+
+- Pada halaman **Buka Berkas**, gunakan **Lampirkan Surat** untuk mencari surat masuk atau surat keluar dari tahun yang tersedia. Surat dapat dipilih dari beberapa filter dan halaman tabel sebelum dilampirkan sekaligus melalui daftar sementara **Surat Dipilih**.
+- Gunakan tombol PDF pada daftar calon surat untuk memeriksa dokumen di tab baru sebelum memasukkannya ke daftar sementara.
+- Surat juga dapat langsung diberkaskan dari halaman **Surat Belum Diberkaskan**, **Daftar Surat Masuk**, atau **Daftar Surat Keluar** dengan memilih berkas aktif melalui tombol berikon folder.
+- Aksi pemberkasan hanya tersedia untuk surat non-SRIKANDI yang belum berada dalam berkas dan tidak terkunci oleh proses alih media. Surat yang sudah berada dalam berkas lain tetap dipindahkan melalui **Pindahkan Terpilih**.
+- Untuk melepaskan surat dari pemberkasan tanpa menghapus suratnya, gunakan tombol **Keluarkan dari Berkas** pada Daftar Isi Berkas dan setujui konfirmasi yang ditampilkan.
 
 ## Persyaratan
 

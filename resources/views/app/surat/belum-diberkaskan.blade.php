@@ -2,78 +2,22 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
 @endpush
 
 @push('js')
     <script src="{{ asset('js/datatables.min.js') }}"></script>
-@endpush
-
-@push('js')
-    <script>
-        $(document).ready(function () {
-            const table = $('#datatabel').DataTable({
-                scrollX: true,
-                autoWidth: false,
-                paging: true,
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: `{{ route('surat.belum-diberkaskan') }}`,
-                },
-                columns: [
-                    {
-                        data: 'jenis',
-                        name: 'jenis',
-                        render: function (data) {
-                            const badgeClass = data === 'masuk' ? 'badge-info' : 'badge-success';
-                            const label = data === 'masuk' ? 'Surat Masuk' : 'Surat Keluar';
-
-                            return `<span class="badge ${badgeClass}">${label}</span>`;
-                        },
-                    },
-                    {
-                        data: 'tanggal_pencatatan',
-                        name: 'tanggal_pencatatan',
-                    },
-                    {
-                        data: 'tanggal_surat',
-                        name: 'tanggal_surat',
-                    },
-                    {
-                        data: 'nomor_surat',
-                        name: 'nomor_surat',
-                    },
-                    {
-                        data: 'pihak',
-                        name: 'pihak',
-                    },
-                    {
-                        data: 'perihal',
-                        name: 'perihal',
-                    },
-                    {
-                        data: 'aksi',
-                        name: 'aksi',
-                        orderable: false,
-                        searchable: false,
-                    },
-                ],
-                order: [[1, 'desc']],
-            });
-
-            table.on('xhr.dt', function (event, settings, json) {
-                if (!json) {
-                    return;
-                }
-
-                $('#totalSuratBelumDiberkaskan').text(json.recordsFiltered ?? 0);
-            });
-        });
-    </script>
+    <script src="{{ asset('js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/direct-filing.min.js') }}"></script>
+    <script src="{{ asset('js/belum-diberkaskan.min.js') }}"></script>
 @endpush
 
 @section('konten')
-    <div class="mt-4">
+    <div
+        id="pendingFilingPage"
+        class="mt-4"
+        data-list-url="{{ route('surat.belum-diberkaskan') }}"
+    >
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">Surat Belum Diberkaskan</h5>
@@ -103,4 +47,6 @@
             </div>
         </div>
     </div>
+
+    @include('components.direct-filing-modal')
 @endsection

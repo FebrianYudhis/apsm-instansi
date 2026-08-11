@@ -121,6 +121,9 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
     Route::get('surat/berkas/buka/{id}', [BerkasContentController::class, 'buka'])
         ->whereNumber('id')
         ->name('berkas.buka');
+    Route::post('surat/berkas/lampirkan/{id}', [BerkasContentController::class, 'lampirkanBulk'])
+        ->whereNumber('id')
+        ->name('berkas.lampirkanBulk');
     Route::get('surat/berkas/aktif/list', [BerkasContentController::class, 'daftarBerkasAktif'])->name('berkas.aktif.list');
     Route::post('surat/berkas/keluarkan/{idBerkas}/{jenis}/{idSurat}', [BerkasContentController::class, 'keluarkan'])
         ->whereNumber('idBerkas')
