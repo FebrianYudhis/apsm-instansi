@@ -112,12 +112,17 @@
                                                 $startYear = (int) config('app.start_year', 2025);
                                                 $currentYear = Carbon\Carbon::now()->year;
                                                 $years = range($startYear, $currentYear);
+                                                $yearSwitchRedirectTo = request()->getPathInfo();
+
+                                                if ($queryString = request()->getQueryString()) {
+                                                    $yearSwitchRedirectTo .= '?'.$queryString;
+                                                }
                                             @endphp
 
                                             @foreach ($years as $year)
                                                 <form action="{{ route('pindah-tahun', $year) }}" method="POST">
                                                     @csrf
-                                                    <input type="hidden" name="redirect_to" value="{{ request()->getRequestUri() }}">
+                                                    <input type="hidden" name="redirect_to" value="{{ $yearSwitchRedirectTo }}">
                                                     <button type="submit"
                                                         class="nav-link border-0 bg-transparent text-left w-100">{{ $year }}</button>
                                                 </form>

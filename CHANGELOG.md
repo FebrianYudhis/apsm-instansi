@@ -4,6 +4,16 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2026-08-11
+
+### Added
+
+- Menambahkan pengujian regresi untuk memastikan target redirect Pindah Tahun tidak menyertakan base path aplikasi.
+
+### Fixed
+
+- Memperbaiki redirect Pindah Tahun ketika aplikasi dijalankan pada subpath seperti `/apsm`, sehingga URL tidak lagi menjadi `/apsm/apsm` dan query string halaman tetap dipertahankan.
+
 ## [0.9.0] - 2026-08-10
 
 ### Added

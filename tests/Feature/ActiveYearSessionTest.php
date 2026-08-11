@@ -16,6 +16,21 @@ beforeEach(function () {
     Storage::fake('documents');
 });
 
+test('year switch form omits the application base path from its redirect target', function () {
+    $user = User::factory()->create();
+
+    $this->withActiveYear(2025)
+        ->actingAs($user)
+        ->withServerVariables([
+            'SCRIPT_NAME' => '/apsm/index.php',
+            'SCRIPT_FILENAME' => public_path('index.php'),
+            'REQUEST_URI' => '/apsm/app?bagian=surat-terbaru',
+        ])
+        ->get('/apsm/app?bagian=surat-terbaru')
+        ->assertOk()
+        ->assertSee('name="redirect_to" value="/app?bagian=surat-terbaru"', false);
+});
+
 test('login stores the selected active year in the session', function () {
     $user = User::factory()->create();
 
