@@ -79,12 +79,26 @@ class AppController extends Controller
 
             return DataTables::of($query)
                 ->addColumn('aksi', function ($data) {
-                    $button = "<div class='d-flex justify-content-center'>";
-                    $button .= "<a href='".e(route('klasifikasi.edit', [$data['id']]))."' class='btn btn-primary btn-sm mr-1' title='Edit'><i class='fa fa-edit'></i></a>";
-                    $button .= "<form action='".e(route('klasifikasi.hapus', [$data['id']]))."' class='m-0 konfirmasi-hapus' method='POST'> ".csrf_field().method_field('delete')." <button type='submit' class='btn btn-danger btn-sm' title='Hapus'><i class='fa fa-trash'></i></button></form>";
-                    $button .= '</div>';
+                    $menu = "<div class='dropdown text-center'>";
+                    $menu .= "<button class='btn btn-sm btn-light border shadow-none' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' title='Menu Aksi' style='width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;'>";
+                    $menu .= "<i class='fa fa-ellipsis-v text-secondary'></i>";
+                    $menu .= '</button>';
+                    $menu .= "<div class='dropdown-menu dropdown-menu-right shadow border-0 py-1' style='min-width: 150px;'>";
 
-                    return $button;
+                    $menu .= "<a href='".e(route('klasifikasi.edit', [$data['id']]))."' class='dropdown-item text-primary py-2 d-flex align-items-center' title='Edit'>";
+                    $menu .= "<i class='fa fa-edit mr-2' style='width: 16px; text-align: center;'></i> <span>Edit</span>";
+                    $menu .= '</a>';
+
+                    $menu .= "<div class='dropdown-divider my-1'></div>";
+                    $menu .= "<form action='".e(route('klasifikasi.hapus', [$data['id']]))."' class='m-0' method='POST'>";
+                    $menu .= csrf_field().method_field('delete');
+                    $menu .= "<button type='submit' class='dropdown-item text-danger py-2 d-flex align-items-center konfirmasi-hapus' title='Hapus'>";
+                    $menu .= "<i class='fa fa-trash mr-2 text-danger' style='width: 16px; text-align: center;'></i> <span>Hapus</span>";
+                    $menu .= '</button></form>';
+
+                    $menu .= '</div></div>';
+
+                    return $menu;
                 })->rawColumns(['aksi'])->toJson();
         }
 

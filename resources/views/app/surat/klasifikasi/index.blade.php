@@ -46,8 +46,18 @@
 @section('konten')
     <div class="mt-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Klasifikasi</h5>
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
+                    <h5 class="mb-2 mb-sm-0 font-weight-bold text-dark">Daftar Klasifikasi</h5>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <a href="{{ route('surat.klasifikasi.export') }}" class="btn btn-sm btn-outline-success mr-2">
+                            <i class="fa fa-download mr-1"></i> Export Klasifikasi ke Excel
+                        </a>
+                        <a href="{{ route('klasifikasi.tambah') }}" class="btn btn-sm btn-primary">
+                            <i class="fa fa-plus mr-1"></i> Tambah Data
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -65,22 +75,4 @@
             </div>
         </div>
     </div>
-
-    @include('components.floating-actions', [
-        'id' => 'klasifikasi-floating-actions',
-        'actions' => [
-            [
-                'url' => route('klasifikasi.tambah'),
-                'label' => 'Tambah Data',
-                'icon' => 'fa fa-plus',
-                'class' => 'btn-primary',
-            ],
-            [
-                'url' => route('surat.klasifikasi.export'),
-                'label' => 'Export Klasifikasi ke Excel',
-                'icon' => 'fa fa-download',
-                'class' => 'btn-success',
-            ],
-        ],
-    ])
 @endsection

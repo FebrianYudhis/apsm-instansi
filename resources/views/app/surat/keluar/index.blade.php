@@ -214,8 +214,19 @@
 @section('konten')
     <div class="mt-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Surat Keluar</h5>
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
+                    <h5 class="mb-2 mb-sm-0 font-weight-bold text-dark">Daftar Surat Keluar</h5>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-info mr-2" data-toggle="modal"
+                            data-target="#modalFilterSuratKeluar">
+                            <i class="fa fa-filter mr-1"></i> Filter & Export
+                        </button>
+                        <a href="{{ route('keluar.tambah') }}" class="btn btn-sm btn-primary">
+                            <i class="fa fa-plus mr-1"></i> Tambah Data
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -239,27 +250,6 @@
             </div>
         </div>
     </div>
-
-    @include('components.floating-actions', [
-        'id' => 'surat-keluar-floating-actions',
-        'actions' => [
-            [
-                'url' => route('keluar.tambah'),
-                'label' => 'Tambah Data',
-                'icon' => 'fa fa-plus',
-                'class' => 'btn-primary',
-            ],
-            [
-                'label' => 'Filter dan Export Surat Keluar',
-                'icon' => 'fa fa-filter',
-                'class' => 'btn-info',
-                'attributes' => [
-                    'data-toggle' => 'modal',
-                    'data-target' => '#modalFilterSuratKeluar',
-                ],
-            ],
-        ],
-    ])
 
     @include('components.direct-filing-modal')
 

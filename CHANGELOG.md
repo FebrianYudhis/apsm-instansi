@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.3] - 2026-08-20
+
+### Changed
+
+- Memindahkan tombol aksi (**Tambah Data**, **Filter Data**, dan **Export**) pada seluruh halaman master (**Daftar Surat Masuk**, **Daftar Surat Keluar**, **Daftar Surat Digital**, **Daftar Berkas**, dan **Daftar Klasifikasi**) dari floating action button (FAB) melayang ke bagian kanan Card Header dengan tata letak responsif untuk desktop dan perangkat seluler.
+- Mengubah kolom aksi pada tabel **Daftar Klasifikasi** menjadi tombol dropdown menu titik tiga (*three-dots action menu*) yang seragam dengan menu lainnya.
+
 ## [0.10.2] - 2026-08-20
 
 ### Changed

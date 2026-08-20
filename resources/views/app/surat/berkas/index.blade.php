@@ -256,8 +256,18 @@
 @section('konten')
     <div class="mt-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Berkas</h5>
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
+                    <h5 class="mb-2 mb-sm-0 font-weight-bold text-dark">Daftar Berkas</h5>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-info mr-2" id="btnOpenFilterModal">
+                            <i class="fa fa-filter mr-1"></i> Filter Data
+                        </button>
+                        <a href="{{ route('berkas.tambah') }}" class="btn btn-sm btn-primary">
+                            <i class="fa fa-plus mr-1"></i> Tambah Data
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 @if (request('isi') === 'kosong')
@@ -291,26 +301,6 @@
             </div>
         </div>
     </div>
-
-    @include('components.floating-actions', [
-        'id' => 'berkas-floating-actions',
-        'actions' => [
-            [
-                'label' => 'Filter Data',
-                'icon' => 'fa fa-filter',
-                'class' => 'btn-info',
-                'attributes' => [
-                    'id' => 'btnOpenFilterModal',
-                ],
-            ],
-            [
-                'url' => route('berkas.tambah'),
-                'label' => 'Tambah Data',
-                'icon' => 'fa fa-plus',
-                'class' => 'btn-primary',
-            ],
-        ],
-    ])
 
     <div class="modal fade" id="modalFilterBerkas" tabindex="-1" aria-labelledby="modalFilterBerkasLabel"
         aria-hidden="true">

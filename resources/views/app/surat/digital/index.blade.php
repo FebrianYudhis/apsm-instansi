@@ -36,8 +36,15 @@
 @section('konten')
     <div class="mt-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Surat Digital</h5>
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
+                    <h5 class="mb-2 mb-sm-0 font-weight-bold text-dark">Daftar Surat Digital</h5>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <a href="{{ route('digital.tambah') }}" class="btn btn-sm btn-primary">
+                            <i class="fa fa-plus mr-1"></i> Tambah Data
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -54,16 +61,4 @@
             </div>
         </div>
     </div>
-
-    @include('components.floating-actions', [
-        'id' => 'surat-digital-floating-actions',
-        'actions' => [
-            [
-                'url' => route('digital.tambah'),
-                'label' => 'Tambah Data',
-                'icon' => 'fa fa-plus',
-                'class' => 'btn-primary',
-            ],
-        ],
-    ])
 @endsection
