@@ -2,17 +2,61 @@
 
 @section('konten')
     @if (session('plain_text_token'))
-        <div class="alert alert-warning" role="alert">
-            <h4 class="alert-heading">Salin token sekarang</h4>
-            <p>Token hanya ditampilkan satu kali. Simpan di tempat yang aman dan jangan memasukkannya ke URL atau log aplikasi.</p>
-            <div class="input-group">
-                <input type="text" class="form-control text-monospace" id="plain-text-token"
-                    value="{{ session('plain_text_token') }}" readonly autocomplete="off"
-                    spellcheck="false" aria-label="Personal Access Token baru">
+        <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm p-4 mb-4" role="alert"
+            style="border-left: 5px solid #ffc107 !important; background-color: #fffdf5; border-radius: 8px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Tutup" style="top: 12px; right: 15px;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div class="d-flex align-items-center pr-5 mb-3">
+                <span class="mr-3 rounded-circle bg-warning text-white d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
+                    style="width: 40px; height: 40px; min-width: 40px; font-size: 1.1rem;">
+                    <i class="fa fa-key"></i>
+                </span>
+                <div>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <h4 class="alert-heading mb-0 mr-2 font-weight-bold text-dark" style="font-size: 1.15rem;">
+                            Personal Access Token Berhasil Dibuat
+                        </h4>
+                        <span class="badge badge-warning py-1 px-2 font-weight-bold text-uppercase mt-1 mt-sm-0" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                            <i class="fa fa-exclamation-triangle mr-1"></i>Hanya Ditampilkan Sekali
+                        </span>
+                    </div>
+                    <span class="text-muted small">Salin dan amankan token Anda sekarang</span>
+                </div>
+            </div>
+
+            <p class="text-secondary mb-3" style="font-size: 0.92rem; line-height: 1.5;">
+                Demi keamanan akun, token ini <strong>tidak akan pernah ditampilkan lagi</strong> setelah Anda meninggalkan atau memuat ulang halaman ini. Pastikan Anda menyalin dan menyimpannya di tempat yang aman.
+            </p>
+
+            <div class="input-group shadow-sm mb-2">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-white border-right-0 text-muted px-3">
+                        <i class="fa fa-terminal"></i>
+                    </span>
+                </div>
+                <input type="text" class="form-control text-monospace bg-white border-left-0 border-right-0 font-weight-bold"
+                    id="plain-text-token" value="{{ session('plain_text_token') }}" readonly autocomplete="off"
+                    spellcheck="false" aria-label="Personal Access Token baru"
+                    onclick="this.select();"
+                    style="font-size: 0.95rem; color: #1e293b; letter-spacing: 0.5px; height: calc(2.25rem + 10px);">
                 <div class="input-group-append">
-                    <button type="button" class="btn btn-dark copy-api-token" data-target="plain-text-token">
-                        Salin token
+                    <button type="button" class="btn btn-primary px-3 copy-api-token font-weight-bold d-flex align-items-center"
+                        data-target="plain-text-token" title="Salin token ke clipboard">
+                        <i class="fa fa-copy mr-1"></i>
+                        <span>Salin token</span>
                     </button>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between text-muted small mt-2">
+                <div>
+                    <i class="fa fa-info-circle text-primary mr-1"></i>
+                    Gunakan pada header: <code>Authorization: Bearer &lt;token&gt;</code>
+                </div>
+                <div class="mt-1 mt-sm-0">
+                    <i class="fa fa-shield-alt text-success mr-1"></i>
+                    Jangan bagikan token ini kepada pihak yang tidak berwenang
                 </div>
             </div>
         </div>
@@ -105,53 +149,110 @@ Accept: application/json</code></pre>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h3 class="mb-0">Token aktif</h3>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+            <div class="d-flex align-items-center">
+                <span class="mr-2 text-primary font-size-18">
+                    <i class="fa fa-key"></i>
+                </span>
+                <h3 class="mb-0 font-weight-bold" style="font-size: 1.15rem;">Token Aktif</h3>
+            </div>
+            <span class="badge badge-pill badge-primary px-3 py-2 font-weight-bold">
+                {{ $tokens->count() }} Token
+            </span>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Kemampuan</th>
-                            <th>Dibuat</th>
-                            <th>Terakhir digunakan</th>
-                            <th>Kedaluwarsa</th>
-                            <th class="text-right">Aksi</th>
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr class="text-secondary" style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <th class="py-3 px-4 border-top-0" style="width: 25%;">Nama Token</th>
+                            <th class="py-3 px-3 border-top-0">Kemampuan</th>
+                            <th class="py-3 px-3 border-top-0">Dibuat</th>
+                            <th class="py-3 px-3 border-top-0">Terakhir Digunakan</th>
+                            <th class="py-3 px-3 border-top-0">Kedaluwarsa</th>
+                            <th class="py-3 px-4 border-top-0 text-right" style="width: 10%;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($tokens as $token)
                             <tr>
-                                <td>{{ $token->name }}</td>
-                                <td>
-                                    @foreach ($token->abilities ?? [] as $ability)
-                                        <span class="badge badge-info">{{ $ability }}</span>
-                                    @endforeach
+                                <td class="py-3 px-4 align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-2 text-muted">
+                                            <i class="fa fa-shield-alt text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <strong class="text-dark d-block" style="font-size: 0.95rem;">{{ $token->name }}</strong>
+                                            <small class="text-muted text-monospace">ID: #{{ $token->getKey() }}</small>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>{{ $token->created_at?->translatedFormat('d M Y H:i') }}</td>
-                                <td>
-                                    {{ $token->last_used_at?->translatedFormat('d M Y H:i') ?? 'Belum pernah' }}
+                                <td class="py-3 px-3 align-middle">
+                                    @forelse ($token->abilities ?? [] as $ability)
+                                        <span class="badge badge-info px-2 py-1">
+                                            {{ $ability }}
+                                        </span>
+                                    @empty
+                                        <span class="text-muted small">-</span>
+                                    @endforelse
                                 </td>
-                                <td>{{ $token->expires_at?->translatedFormat('d M Y H:i') ?? 'Tidak dibatasi' }}</td>
-                                <td class="text-right">
+                                <td class="py-3 px-3 align-middle text-secondary small">
+                                    <i class="fa fa-calendar-alt text-muted mr-1"></i>
+                                    {{ $token->created_at?->translatedFormat('d M Y H:i') ?? '-' }}
+                                </td>
+                                <td class="py-3 px-3 align-middle small">
+                                    @if ($token->last_used_at)
+                                        <span class="text-dark">
+                                            <i class="fa fa-clock text-info mr-1"></i>
+                                            {{ $token->last_used_at->translatedFormat('d M Y H:i') }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-light text-muted border px-2 py-1">Belum pernah</span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-3 align-middle small">
+                                    @if ($token->expires_at)
+                                        @if ($token->expires_at->isPast())
+                                            <span class="badge badge-danger px-2 py-1">
+                                                <i class="fa fa-exclamation-circle mr-1"></i>Kedaluwarsa
+                                            </span>
+                                        @else
+                                            <span class="text-dark">
+                                                <i class="fa fa-hourglass-half text-warning mr-1"></i>
+                                                {{ $token->expires_at->translatedFormat('d M Y H:i') }}
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="badge badge-light text-muted border px-2 py-1">Tidak dibatasi</span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-4 align-middle text-right">
                                     <form action="{{ route('api-tokens.destroy', $token->getKey()) }}"
                                         method="POST" class="d-inline revoke-api-token-form"
                                         data-token-name="{{ $token->name }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            Cabut
+                                        <button type="submit" class="btn btn-sm btn-outline-danger shadow-none"
+                                            title="Cabut token ini">
+                                            <i class="fa fa-trash-alt mr-1"></i> Cabut
                                         </button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    Belum ada token API.
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <div class="mb-3">
+                                            <span class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center"
+                                                style="width: 54px; height: 54px;">
+                                                <i class="fa fa-key fa-2x text-muted opacity-50"></i>
+                                            </span>
+                                        </div>
+                                        <h5 class="font-weight-bold text-secondary mb-1">Belum Ada Token API</h5>
+                                        <p class="small text-muted mb-0">Buat token baru melalui formulir di atas untuk menghubungkan integrasi aplikasi.</p>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse

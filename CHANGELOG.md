@@ -4,6 +4,18 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1] - 2026-08-20
+
+### Changed
+
+- Memperbarui dan merapikan tampilan notifikasi pembuatan Personal Access Token pada halaman pengelolaan Token API dengan tata letak yang lebih terstruktur, kartu peringatan yang lebih jelas, ikon penanda, serta petunjuk format header otorisasi.
+- Memperbarui dan merapikan tabel daftar Token Aktif dengan header terstruktur, badge jumlah token, identitas ID token, visualisasi status masa berlaku/kedaluwarsa, badge kemampuan, tombol aksi cabut yang modern, dan tampilan state kosong (*empty state*) yang informatif.
+- Memperbarui interaksi JavaScript penyalinan token (`api-tokens.min.js`) agar memberikan umpan balik visual langsung (transisi warna tombol, ikon centang, dan teks "Tersalin!") saat tombol salin ditekan.
+
+### Fixed
+
+- Memperbaiki posisi badge status "Hanya Ditampilkan Sekali" pada notifikasi pembuatan token agar berdampingan rapi dengan judul dan tidak bertabrakan dengan tombol tutup (*dismiss button*) pada berbagai resolusi layar.
+
 ## [0.10.0] - 2026-08-11
 
 ### Added
