@@ -4,6 +4,16 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.5] - 2026-08-20
+
+### Changed
+
+- Memindahkan tombol aksi (**Daftar Arsip Alih Media**, **Tutup Semua Proses**, dan **Export Selesai**) pada modul **Alih Media** (Pemrosesan & Selesai) ke bagian kanan Card Header yang responsif.
+
+### Removed
+
+- Menghapus komponen *Floating Action Button* (`components/floating-actions.blade.php`), gaya CSS terkait (`.floating-actions`, `.floating-action-*`) pada berkas tema (`apsm-theme.css` & `apsm-theme.min.css`), serta seluruh penggunaannya di aplikasi sehingga tampilan seluruh halaman kini bersih, terpadu, dan bebas dari tombol melayang.
+
 ## [0.10.4] - 2026-08-20
 
 ### Changed

@@ -70,8 +70,15 @@
 @section('konten')
     <div class="mt-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Selesai Alih Media</h5>
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
+                    <h5 class="mb-2 mb-sm-0 font-weight-bold text-dark">Daftar Selesai Alih Media</h5>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <a href="{{ route('alih-media.selesai.export-daftar-arsip') }}" class="btn btn-sm btn-outline-success">
+                            <i class="fa fa-download mr-1"></i> Export Daftar Arsip Alih Media
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -93,16 +100,4 @@
             </div>
         </div>
     </div>
-
-    @include('components.floating-actions', [
-        'id' => 'alih-media-selesai-floating-actions',
-        'actions' => [
-            [
-                'url' => route('alih-media.selesai.export-daftar-arsip'),
-                'label' => 'Export Daftar Arsip Alih Media',
-                'icon' => 'fa fa-download',
-                'class' => 'btn-success',
-            ],
-        ],
-    ])
 @endsection

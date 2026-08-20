@@ -89,8 +89,21 @@
 @section('konten')
     <div class="mt-4">
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Pemrosesan Alih Media</h5>
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
+                    <h5 class="mb-2 mb-sm-0 font-weight-bold text-dark">Daftar Pemrosesan Alih Media</h5>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <a href="{{ route('alih-media.diproses.export-daftar-arsip') }}" class="btn btn-sm btn-outline-success mr-2">
+                            <i class="fa fa-download mr-1"></i> Daftar Arsip Alih Media
+                        </a>
+                        <form action="{{ route('alih-media.diproses.tutup-semua') }}" method="POST" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-primary konfirmasi-tutup-semua-alih-media">
+                                <i class="fa fa-check mr-1"></i> Tutup Semua Proses
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -112,22 +125,4 @@
             </div>
         </div>
     </div>
-
-    @include('components.floating-actions', [
-        'id' => 'alih-media-diproses-floating-actions',
-        'actions' => [
-            [
-                'url' => route('alih-media.diproses.export-daftar-arsip'),
-                'label' => 'Daftar Arsip Alih Media',
-                'icon' => 'fa fa-download',
-                'class' => 'btn-success',
-            ],
-            [
-                'form_action' => route('alih-media.diproses.tutup-semua'),
-                'label' => 'Tutup Semua Proses Alih Media',
-                'icon' => 'fa fa-check',
-                'class' => 'btn-primary konfirmasi-tutup-semua-alih-media',
-            ],
-        ],
-    ])
 @endsection
