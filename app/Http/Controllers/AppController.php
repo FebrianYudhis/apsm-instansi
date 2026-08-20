@@ -28,19 +28,40 @@ class AppController extends Controller
 
             return DataTables::of($query)
                 ->addColumn('aksi', function ($data) {
-                    $button = "<div class='d-flex justify-content-center'>";
+                    $menu = "<div class='dropdown text-center'>";
+                    $menu .= "<button class='btn btn-sm btn-light border shadow-none' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' title='Menu Aksi' style='width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;'>";
+                    $menu .= "<i class='fa fa-ellipsis-v text-secondary'></i>";
+                    $menu .= '</button>';
+                    $menu .= "<div class='dropdown-menu dropdown-menu-right shadow border-0 py-1' style='min-width: 175px;'>";
+
+                    $menu .= "<a href='".e(route('surat.detailItem', ['digital', $data['id']]))."' target='_blank' rel='noopener noreferrer' class='dropdown-item text-info py-2 d-flex align-items-center' title='Lihat Detail'>";
+                    $menu .= "<i class='fa fa-eye mr-2' style='width: 16px; text-align: center;'></i> <span>Lihat Detail</span>";
+                    $menu .= '</a>';
+
                     if (! empty($data['url'])) {
-                        $button .= "<a href='".e($this->documents->adminUrl(
+                        $menu .= "<a href='".e($this->documents->adminUrl(
                             DocumentService::TYPE_DIGITAL,
                             $data,
                             DocumentService::VARIANT_ORIGINAL
-                        ))."' target='_blank' rel='noopener noreferrer' class='btn btn-success btn-sm mr-1' title='Lihat Berkas (PDF)'><i class='fa fa-file-pdf'></i></a>";
+                        ))."' target='_blank' rel='noopener noreferrer' class='dropdown-item text-success py-2 d-flex align-items-center' title='Lihat Berkas (PDF)'>";
+                        $menu .= "<i class='fa fa-file-pdf mr-2' style='width: 16px; text-align: center;'></i> <span>Lihat Berkas (PDF)</span>";
+                        $menu .= '</a>';
                     }
-                    $button .= "<a href='".e(route('digital.edit', [$data['id']]))."' class='btn btn-primary btn-sm mr-1' title='Edit'><i class='fa fa-edit'></i></a>";
-                    $button .= "<form action='".e(route('digital.hapus', [$data['id']]))."' class='m-0 konfirmasi-hapus' method='POST'> ".csrf_field().method_field('delete')." <button type='submit' class='btn btn-danger btn-sm' title='Hapus'><i class='fa fa-trash'></i></button></form>";
-                    $button .= '</div>';
 
-                    return $button;
+                    $menu .= "<a href='".e(route('digital.edit', [$data['id']]))."' class='dropdown-item text-primary py-2 d-flex align-items-center' title='Edit'>";
+                    $menu .= "<i class='fa fa-edit mr-2' style='width: 16px; text-align: center;'></i> <span>Edit</span>";
+                    $menu .= '</a>';
+
+                    $menu .= "<div class='dropdown-divider my-1'></div>";
+                    $menu .= "<form action='".e(route('digital.hapus', [$data['id']]))."' class='m-0' method='POST'>";
+                    $menu .= csrf_field().method_field('delete');
+                    $menu .= "<button type='submit' class='dropdown-item text-danger py-2 d-flex align-items-center konfirmasi-hapus' title='Hapus'>";
+                    $menu .= "<i class='fa fa-trash mr-2 text-danger' style='width: 16px; text-align: center;'></i> <span>Hapus</span>";
+                    $menu .= '</button></form>';
+
+                    $menu .= '</div></div>';
+
+                    return $menu;
                 })->rawColumns(['aksi'])->toJson();
         }
 
@@ -241,46 +262,42 @@ class AppController extends Controller
                         return $value !== null && $value !== '';
                     });
 
-                    $button = "<div class='d-flex justify-content-center'>";
-                    $button .= "<a href='".e(route('berkas.buka', array_merge([$data['id']], $filterParams)))."' class='btn btn-success btn-sm mr-1' target='_blank' rel='noopener noreferrer' title='Buka Berkas'><i class='fa fa-folder-open'></i></a>";
+                    $menu = "<div class='dropdown text-center'>";
+                    $menu .= "<button class='btn btn-sm btn-light border shadow-none' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' title='Menu Aksi' style='width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;'>";
+                    $menu .= "<i class='fa fa-ellipsis-v text-secondary'></i>";
+                    $menu .= '</button>';
+                    $menu .= "<div class='dropdown-menu dropdown-menu-right shadow border-0 py-1' style='min-width: 195px;'>";
+
+                    $menu .= "<h6 class='dropdown-header text-uppercase font-weight-bold text-muted px-3 py-1' style='font-size: 0.72rem; letter-spacing: 0.5px;'>Aksi Berkas</h6>";
+
+                    $menu .= "<a href='".e(route('berkas.buka', array_merge([$data['id']], $filterParams)))."' class='dropdown-item text-success py-2 d-flex align-items-center' target='_blank' rel='noopener noreferrer' title='Buka Berkas'>";
+                    $menu .= "<i class='fa fa-folder-open mr-2' style='width: 16px; text-align: center;'></i> <span>Buka Berkas</span>";
+                    $menu .= '</a>';
+
                     if ($data->isAlihMediaLocked()) {
-                        $button .= "<button type='button' class='btn btn-secondary btn-sm' title='Terkunci karena alih media' disabled><i class='fa fa-lock'></i></button>";
+                        $menu .= "<span class='dropdown-item disabled text-muted py-2 d-flex align-items-center' title='Terkunci karena alih media'>";
+                        $menu .= "<i class='fa fa-lock mr-2' style='width: 16px; text-align: center;'></i> <span>Terkunci (Alih Media)</span>";
+                        $menu .= '</span>';
                     } else {
-                        $button .= "<form action='".e(route('berkas.hapus', [$data['id']]))."' class='m-0 konfirmasi-hapus' method='POST'> ".csrf_field().method_field('delete')." <button type='submit' class='btn btn-danger btn-sm' title='Hapus'><i class='fa fa-trash'></i></button></form>";
-                    }
-                    $button .= '</div>';
-
-                    return $button;
-                })->addColumn('status', function ($data) {
-                    if ($data->isAlihMediaLocked()) {
-                        return '<span class="badge badge-secondary">Terkunci Alih Media</span>';
+                        $menu .= "<form action='".e(route('berkas.hapus', [$data['id']]))."' class='m-0' method='POST'>";
+                        $menu .= csrf_field().method_field('delete');
+                        $menu .= "<button type='submit' class='dropdown-item text-danger py-2 d-flex align-items-center konfirmasi-hapus' title='Hapus Berkas'>";
+                        $menu .= "<i class='fa fa-trash mr-2 text-danger' style='width: 16px; text-align: center;'></i> <span>Hapus Berkas</span>";
+                        $menu .= '</button></form>';
                     }
 
-                    $button = '';
-                    if ($data->status_id == 1) {
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 2]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-secondary w-100'>Usul Pindah UP ke UK</button></form>";
-                    } elseif ($data->status_id == 2) {
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 1]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-info w-100'>Aktif</button></form>";
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 3]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-secondary w-100'>Inaktif</button></form>";
-                    } elseif ($data->status_id == 3) {
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 2]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-info w-100'>Usul Pindah UP ke UK</button></form>";
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 4]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-secondary w-100'>Usul Musnah</button></form>";
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 6]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-secondary w-100'>Usul Permanen</button></form>";
-                    } elseif ($data->status_id == 4) {
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 3]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-info w-100'>Inaktif</button></form>";
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 5]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-secondary w-100'>Musnah</button></form>";
-                    } elseif ($data->status_id == 6) {
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 3]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-info w-100'>Inaktif</button></form>";
-                        $button = $button."<form action='".e(route('berkas.pindah', [$data['id'], 7]))."' class='mt-1 w-100 konfirmasi-pindah' method='POST'> ".csrf_field()." <button type='submit' class='btn btn-secondary w-100'>Permanen</button></form>";
-                    } elseif ($data->status_id == 5) {
-                        $button = '<span class="badge badge-danger">Musnah</span>';
-                    } elseif ($data->status_id == 7) {
-                        $button = '<span class="badge badge-success">Permanen</span>';
+                    $statusItems = $this->berkasStatusTransitions($data);
+                    if ($statusItems !== '') {
+                        $menu .= "<div class='dropdown-divider my-1'></div>";
+                        $menu .= "<h6 class='dropdown-header text-uppercase font-weight-bold text-muted px-3 py-1' style='font-size: 0.72rem; letter-spacing: 0.5px;'>Ubah Status</h6>";
+                        $menu .= $statusItems;
                     }
 
-                    return $button;
+                    $menu .= '</div></div>';
+
+                    return $menu;
                 })
-                ->rawColumns(['aksi', 'status'])->toJson();
+                ->rawColumns(['aksi'])->toJson();
         }
 
         $data = [
@@ -449,5 +466,53 @@ class AppController extends Controller
                 return $button;
             })
             ->rawColumns(['status_alih_media', 'aksi'])->toJson();
+    }
+
+    private function berkasStatusTransitions(Filelist $data): string
+    {
+        if ($data->isAlihMediaLocked()) {
+            return "<span class='dropdown-item disabled text-muted py-2 d-flex align-items-center'>"
+                ."<i class='fa fa-lock mr-2 text-secondary' style='width: 16px; text-align: center;'></i> <span>Terkunci Alih Media</span></span>";
+        }
+
+        $html = '';
+        if ($data->status_id == 1) {
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 2]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-secondary py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-arrow-right mr-2 text-secondary' style='width: 16px; text-align: center;'></i> <span>Usul Pindah UP ke UK</span></button></form>";
+        } elseif ($data->status_id == 2) {
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 1]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-info py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-undo mr-2 text-info' style='width: 16px; text-align: center;'></i> <span>Kembalikan ke Aktif</span></button></form>";
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 3]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-secondary py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-arrow-right mr-2 text-secondary' style='width: 16px; text-align: center;'></i> <span>Pindah ke Inaktif</span></button></form>";
+        } elseif ($data->status_id == 3) {
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 2]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-info py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-undo mr-2 text-info' style='width: 16px; text-align: center;'></i> <span>Usul Pindah UP ke UK</span></button></form>";
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 4]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-warning py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-fire mr-2 text-warning' style='width: 16px; text-align: center;'></i> <span>Usul Musnah</span></button></form>";
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 6]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-success py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-archive mr-2 text-success' style='width: 16px; text-align: center;'></i> <span>Usul Permanen</span></button></form>";
+        } elseif ($data->status_id == 4) {
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 3]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-info py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-undo mr-2 text-info' style='width: 16px; text-align: center;'></i> <span>Kembalikan ke Inaktif</span></button></form>";
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 5]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-danger py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-fire-alt mr-2 text-danger' style='width: 16px; text-align: center;'></i> <span>Musnahkan Berkas</span></button></form>";
+        } elseif ($data->status_id == 6) {
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 3]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-info py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-undo mr-2 text-info' style='width: 16px; text-align: center;'></i> <span>Kembalikan ke Inaktif</span></button></form>";
+            $html .= "<form action='".e(route('berkas.pindah', [$data['id'], 7]))."' class='m-0' method='POST'>".csrf_field()
+                ."<button type='submit' class='dropdown-item text-success py-2 d-flex align-items-center konfirmasi-pindah'>"
+                ."<i class='fa fa-check-circle mr-2 text-success' style='width: 16px; text-align: center;'></i> <span>Jadikan Permanen</span></button></form>";
+        }
+
+        return $html;
     }
 }

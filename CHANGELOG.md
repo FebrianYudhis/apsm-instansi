@@ -4,6 +4,14 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.2] - 2026-08-20
+
+### Changed
+
+- Mengubah kolom aksi pada tabel Daftar Surat Masuk, Daftar Surat Keluar, dan Daftar Surat Digital menjadi tombol dropdown menu titik tiga (*three-dots action menu*) dengan daftar opsi tindakan lengkap beserta ikonnya (Lihat Detail, Lihat Berkas PDF, Berkaskan Surat, Edit, dan Hapus).
+- Menambahkan perilaku buka di tab baru (`target="_blank"`) pada opsi **Lihat Detail** naskah di tabel Surat Masuk, Surat Keluar, Surat Digital, dan Surat Belum Diberkaskan agar halaman daftar yang sedang aktif tidak tertutup.
+- Menggabungkan kolom **Aksi** dan kolom **Status** pada tabel **Daftar Berkas** ke dalam satu tombol menu titik tiga (*three-dots dropdown*), dengan pemisahan seksi yang jelas antara opsi aksi berkas (Buka Berkas, Hapus Berkas) dan opsi alur perubahan status berkas (Usul Pindah UP ke UK, Aktif, Inaktif, Usul Musnah, Usul Permanen, Musnah, Permanen) yang tetap terintegrasi dengan verifikasi MFA.
+
 ## [0.10.1] - 2026-08-20
 
 ### Changed

@@ -184,12 +184,6 @@
                         orderable: false,
                         searchable: false
                     },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
-                    },
                 ],
             });
 
@@ -289,7 +283,6 @@
                                 <th>Retensi Aktif / Inaktif</th>
                                 <th>Keterangan Akhir</th>
                                 <th>Aksi</th>
-                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
