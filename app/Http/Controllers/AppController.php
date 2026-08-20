@@ -316,7 +316,7 @@ class AppController extends Controller
 
         $data = [
             'judul' => 'List Berkas',
-            'classifications' => Classification::orderBy('kode_klasifikasi', 'asc')->get(['id', 'kode_klasifikasi']),
+            'classifications' => Classification::orderBy('kode_klasifikasi', 'asc')->get(['id', 'kode_klasifikasi', 'keterangan']),
             'statuses' => Status::orderBy('nama_status', 'asc')->get(),
         ];
 

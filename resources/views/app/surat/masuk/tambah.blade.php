@@ -76,11 +76,15 @@
                 <div class="form-group">
                     <label for="pemberkasan">Pemberkasan</label>
                     <select class="form-control" id="pemberkasan" name="pemberkasan">
-                        <option value="null" selected>-Kosongkan-</option>
-                        @foreach ($filelist as $item)
-                            <option value="{{ $item->id }}">{{ $item->classification->kode_klasifikasi }} -
-                                {{ $item->nama_berkas }}
-                            </option>
+                        <option value="null" {{ old('pemberkasan', 'null') === 'null' ? 'selected' : '' }}>-Kosongkan-</option>
+                        @foreach ($filelist->sortBy(['classification.kode_klasifikasi', 'nama_berkas'])->groupBy(fn ($item) => $item->classification->kode_klasifikasi . ' - ' . ($item->classification->keterangan ?? 'Tanpa Keterangan')) as $namaKlasifikasi => $berkasList)
+                            <optgroup label="{{ $namaKlasifikasi }}">
+                                @foreach ($berkasList as $item)
+                                    <option value="{{ $item->id }}" {{ old('pemberkasan') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->nama_berkas }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                     @error('pemberkasan')
@@ -109,6 +113,39 @@
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
         $(document).ready(function () {
+            function matchOptgroup(params, data) {
+                if ($.trim(params.term) === '') {
+                    return data;
+                }
+                if (typeof data.text === 'undefined') {
+                    return null;
+                }
+                var term = params.term.toUpperCase();
+                var text = data.text.toUpperCase();
+                if (data.children && data.children.length > 0) {
+                    if (text.indexOf(term) > -1) {
+                        return data;
+                    }
+                    var matchedChildren = [];
+                    for (var i = 0; i < data.children.length; i++) {
+                        var child = data.children[i];
+                        if (child.text && child.text.toUpperCase().indexOf(term) > -1) {
+                            matchedChildren.push(child);
+                        }
+                    }
+                    if (matchedChildren.length > 0) {
+                        var modifiedData = $.extend({}, data, true);
+                        modifiedData.children = matchedChildren;
+                        return modifiedData;
+                    }
+                    return null;
+                }
+                if (text.indexOf(term) > -1) {
+                    return data;
+                }
+                return null;
+            }
+
             function syncSrikandiFields() {
                 if ($('#isSrikandi').is(':checked')) {
                     $('#nomorAgenda').parent().hide();
@@ -122,7 +159,10 @@
                 }
             }
 
-            $('#pemberkasan').select2();
+            $('#pemberkasan').select2({
+                matcher: matchOptgroup,
+                width: '100%'
+            });
             $('#isSrikandi').on('change', syncSrikandiFields);
             syncSrikandiFields();
         });

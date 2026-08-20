@@ -19,11 +19,45 @@
         const attachUrlPlaceholder = String($config.data('attach-url-placeholder'));
         let activeFilelistsRequest = null;
 
+        function matchOptgroup(params, data) {
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+            if (typeof data.text === 'undefined') {
+                return null;
+            }
+            var term = params.term.toUpperCase();
+            var text = data.text.toUpperCase();
+            if (data.children && data.children.length > 0) {
+                if (text.indexOf(term) > -1) {
+                    return data;
+                }
+                var matchedChildren = [];
+                for (var i = 0; i < data.children.length; i++) {
+                    var child = data.children[i];
+                    if (child.text && child.text.toUpperCase().indexOf(term) > -1) {
+                        matchedChildren.push(child);
+                    }
+                }
+                if (matchedChildren.length > 0) {
+                    var modifiedData = $.extend({}, data, true);
+                    modifiedData.children = matchedChildren;
+                    return modifiedData;
+                }
+                return null;
+            }
+            if (text.indexOf(term) > -1) {
+                return data;
+            }
+            return null;
+        }
+
         $filelist.select2({
             dropdownParent: $modal,
             placeholder: $filelist.data('placeholder'),
             allowClear: true,
             width: '100%',
+            matcher: matchOptgroup,
         });
 
         function resetFilelistOptions() {
@@ -43,6 +77,7 @@
             activeFilelistsRequest = $.getJSON(String($config.data('active-filelists-url')))
                 .done(function (response) {
                     const filelists = Array.isArray(response.data) ? response.data : [];
+                    const groups = {};
 
                     filelists.forEach(function (filelist) {
                         const id = String(filelist.id ?? '');
@@ -52,8 +87,31 @@
                         }
 
                         const classification = String(filelist.kode_klasifikasi || '-');
-                        const name = String(filelist.nama_berkas || '-');
-                        $filelist.append(new Option(`${classification} - ${name}`, id));
+                        const keterangan = String(filelist.keterangan_klasifikasi || '');
+                        const groupKey = keterangan ? `[${classification}] ${keterangan}` : classification;
+
+                        if (!groups[groupKey]) {
+                            groups[groupKey] = [];
+                        }
+
+                        groups[groupKey].push({
+                            id: id,
+                            name: String(filelist.nama_berkas || '-')
+                        });
+                    });
+
+                    const groupKeys = Object.keys(groups).sort();
+
+                    groupKeys.forEach(function (groupKey) {
+                        const $optgroup = $('<optgroup>').attr('label', groupKey);
+
+                        groups[groupKey].sort(function (a, b) {
+                            return a.name.localeCompare(b.name);
+                        }).forEach(function (item) {
+                            $optgroup.append(new Option(item.name, item.id));
+                        });
+
+                        $filelist.append($optgroup);
                     });
 
                     if ($filelist.find('option[value!=""]').length === 0) {

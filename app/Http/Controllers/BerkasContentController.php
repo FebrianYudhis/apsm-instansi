@@ -130,13 +130,14 @@ class BerkasContentController extends Controller
     {
         $filelists = Filelist::where('status_id', 1)
             ->whereNull('alih_media_status_id')
-            ->with('classification:id,kode_klasifikasi')
+            ->with('classification:id,kode_klasifikasi,keterangan')
             ->orderBy('nama_berkas')
             ->get(['id', 'classification_id', 'nama_berkas']);
 
         $data = $filelists->map(fn (Filelist $filelist): array => [
             'id' => $filelist->id,
             'kode_klasifikasi' => $filelist->classification?->kode_klasifikasi ?? '-',
+            'keterangan_klasifikasi' => $filelist->classification?->keterangan ?? '',
             'nama_berkas' => $filelist->nama_berkas,
         ])->values();
 

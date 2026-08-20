@@ -321,7 +321,7 @@
                                 @foreach ($classifications as $classification)
                                     <option value="{{ $classification->kode_klasifikasi }}"
                                         {{ request('kode_klasifikasi') == $classification->kode_klasifikasi ? 'selected' : '' }}>
-                                        {{ $classification->kode_klasifikasi }}
+                                        [{{ $classification->kode_klasifikasi }}] {{ $classification->keterangan }}
                                     </option>
                                 @endforeach
                             </select>

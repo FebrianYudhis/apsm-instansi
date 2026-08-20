@@ -12,8 +12,8 @@
                     <label for="kodeKlasifikasi">Kode Klasifikasi</label>
                     <select class="form-control" id="kodeKlasifikasi" name="kodeKlasifikasi">
                         @foreach ($classification as $item)
-                            <option value="{{ $item->id }}" {{ $data['classification_id'] == $item->id ? 'selected' : '' }}>
-                                {{ $item->kode_klasifikasi }}
+                            <option value="{{ $item->id }}" {{ old('kodeKlasifikasi', $data['classification_id']) == $item->id ? 'selected' : '' }}>
+                                [{{ $item->kode_klasifikasi }}] {{ $item->keterangan }}
                             </option>
                         @endforeach
                     </select>

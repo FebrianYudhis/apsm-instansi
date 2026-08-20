@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.4] - 2026-08-20
+
+### Changed
+
+- Mengelompokkan pilihan berkas pada dropdown Select2 **Pemberkasan** di form tambah dan edit naskah (Surat Masuk & Surat Keluar) serta modal aksi cepat **Berkaskan Surat** (*Direct Filing Modal*) berdasarkan kategori **Kode & Keterangan Klasifikasi** menggunakan `<optgroup>`, serta menambahkan pencarian cerdas kustom (*custom optgroup matcher*) sehingga pencarian kode klasifikasi (seperti `HM.02.00`) langsung menampilkan seluruh berkas aktif di bawah grup tersebut untuk dipilih secara instan.
+- Memperbarui format tampilan opsi dropdown Select2 **Kode Klasifikasi** pada form **Tambah/Edit Berkas** dan modal **Filter Berkas** menjadi format yang informatif `[Kode] Penjelasan/Keterangan` (contoh: `[TU.01] Tata Usaha`).
+
 ## [0.10.3] - 2026-08-20
 
 ### Changed

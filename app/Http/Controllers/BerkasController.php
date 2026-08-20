@@ -16,7 +16,7 @@ class BerkasController extends Controller
     {
         return view('app.surat.berkas.tambah', [
             'judul' => 'Tambah Berkas',
-            'classification' => Classification::all(),
+            'classification' => Classification::orderBy('kode_klasifikasi', 'asc')->get(),
         ]);
     }
 
@@ -107,7 +107,7 @@ class BerkasController extends Controller
         return view('app.surat.berkas.edit', [
             'judul' => 'Edit Berkas',
             'data' => $filelist,
-            'classification' => Classification::all(),
+            'classification' => Classification::orderBy('kode_klasifikasi', 'asc')->get(),
         ]);
     }
 
