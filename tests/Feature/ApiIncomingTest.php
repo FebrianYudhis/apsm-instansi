@@ -213,6 +213,21 @@ it('returns false with details when agenda number is used via API', function () 
                 'pengirim' => 'Pusat Data',
                 'perihal' => 'Pengujian API Check',
                 'is_deleted' => false,
+                'detail_url' => route('surat.detailItem', ['masuk', $surat->id]),
+            ],
+        ]);
+
+    $surat->delete();
+
+    $this->withToken($token)
+        ->getJson(route('api.v1.surat.masuk.cek-agenda', ['nomor_agenda' => 88, 'tahun' => 2026]))
+        ->assertSuccessful()
+        ->assertJson([
+            'available' => false,
+            'data' => [
+                'id' => $surat->id,
+                'is_deleted' => true,
+                'detail_url' => null,
             ],
         ]);
 });

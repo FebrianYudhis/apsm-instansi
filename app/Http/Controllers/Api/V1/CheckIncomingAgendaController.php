@@ -54,6 +54,7 @@ class CheckIncomingAgendaController extends Controller
                 'tanggal_surat' => $existing->tanggal_surat ? Carbon::parse($existing->tanggal_surat)->format('d/m/Y') : '-',
                 'tanggal_diterima' => $existing->tanggal_diterima ? Carbon::parse($existing->tanggal_diterima)->format('d/m/Y') : '-',
                 'is_deleted' => $isDeleted,
+                'detail_url' => $isDeleted ? null : route('surat.detailItem', ['masuk', $existing->id]),
             ],
         ]);
     }

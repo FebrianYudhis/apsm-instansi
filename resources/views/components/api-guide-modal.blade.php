@@ -315,7 +315,8 @@
     "perihal": "Laporan Iklim Bulanan",
     "tanggal_surat": "10/08/2026",
     "tanggal_diterima": "12/08/2026",
-    "is_deleted": false
+    "is_deleted": false,
+    "detail_url": "{{ route('surat.detailItem', ['masuk', 1]) }}"
   }
 }</code></pre>
                                                     </div>

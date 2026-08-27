@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.1] - 2026-08-27
+
+### Added
+
+- Menambahkan field `detail_url` pada payload `data` respons REST API pengecekan ketersediaan nomor agenda surat masuk (`GET /api/v1/surat/masuk/cek-agenda`) ketika nomor agenda telah terpakai, guna menyediakan tautan langsung ke halaman detail arsip surat terkait.
+- Memperbarui contoh respons JSON pada dokumentasi panduan API (`api-guide-modal.blade.php`) dan menambahkan pengujian otomatis (`tests/Feature/ApiIncomingTest.php`) untuk memastikan ketersediaan `detail_url` pada surat aktif dan nilai `null` pada surat yang terhapus (*soft-deleted*).
+
 ## [0.13.0] - 2026-08-27
 
 ### Changed
