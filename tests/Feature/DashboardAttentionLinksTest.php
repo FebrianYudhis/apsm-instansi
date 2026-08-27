@@ -223,3 +223,10 @@ test('empty contents filter is preserved when exporting filelists', function () 
         ->toContain('Berkas Kosong')
         ->not->toContain('Berkas Terisi');
 });
+
+test('sidebar contains mode tamu navigation link', function () {
+    $this->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee(route('guest'))
+        ->assertSee('Mode Tamu');
+});

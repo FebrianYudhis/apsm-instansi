@@ -4,6 +4,12 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2026-08-27
+
+### Added
+
+- Menambahkan tautan navigasi **Mode Tamu** pada sidebar panel admin (di bawah menu _Pindah Tahun_) untuk memudahkan beralih atau melihat portal pencarian arsip publik (`/guest`).
+
 ## [0.11.0] - 2026-08-27
 
 ### Added

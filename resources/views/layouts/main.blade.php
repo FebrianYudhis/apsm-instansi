@@ -141,6 +141,10 @@
                                 </div>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('guest') }}" class="nav-link" target="_blank"><i
+                                        class="fa fa-fw fa-globe"></i>Mode Tamu</a>
+                            </li>
+                            <li class="nav-item">
                                 <form action="{{ route('logout') }}" method="POST" class="mb-0 nav-link sidebar-logout-form">
                                     @csrf
                                     <button type="submit" class="sidebar-logout-button border-0 p-0 text-left">
