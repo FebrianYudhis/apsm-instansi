@@ -177,7 +177,9 @@
                                                                 <td><code>nomor_agenda</code></td>
                                                                 <td><span class="badge badge-danger">Ya</span></td>
                                                                 <td><code>125</code></td>
-                                                                <td>Integer minimal 1 dan unik dalam tahun yang sama.</td>
+                                                                <td>
+                                                                    Integer minimal 1 dan unik dalam tahun yang sama. Dapat dicek terlebih dahulu via endpoint pengecekan agenda.
+                                                                </td>
                                                             </tr>
                                                             <tr>
                                                                 <td><code>tanggal_diterima</code></td>
@@ -243,6 +245,80 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card">
+                                        <div class="card-header" id="apiGuideIncomingCekAgendaHeading">
+                                            <button class="btn btn-link btn-block text-left collapsed" type="button"
+                                                data-toggle="collapse" data-target="#apiGuideIncomingCekAgenda"
+                                                aria-expanded="false" aria-controls="apiGuideIncomingCekAgenda">
+                                                <i class="fa fa-search mr-1 text-info"></i>
+                                                Pengecekan Ketersediaan Nomor Agenda
+                                                <span class="badge badge-info ml-2">GET cek-agenda</span>
+                                            </button>
+                                        </div>
+                                        <div id="apiGuideIncomingCekAgenda" class="collapse"
+                                            aria-labelledby="apiGuideIncomingCekAgendaHeading"
+                                            data-parent="#apiGuideIncomingScenarios">
+                                            <div class="card-body">
+                                                <p class="mb-2 small text-muted">
+                                                    Gunakan endpoint ini untuk memastikan nomor agenda belum terpakai pada tahun yang bersangkutan sebelum mengirim data surat masuk non-SRIKANDI.
+                                                </p>
+                                                <p class="mb-3">
+                                                    Endpoint: <code>GET {{ route('api.v1.surat.masuk.cek-agenda') }}</code>
+                                                </p>
+                                                <div class="table-responsive mb-3">
+                                                    <table class="table table-sm table-bordered mb-0">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>Parameter (Query)</th>
+                                                                <th>Wajib</th>
+                                                                <th>Tipe / Contoh</th>
+                                                                <th>Panduan</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td><code>nomor_agenda</code></td>
+                                                                <td><span class="badge badge-danger">Ya</span></td>
+                                                                <td><code>15</code></td>
+                                                                <td>Nomor agenda yang ingin dicek ketersediaannya (integer minimal 1).</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><code>tahun</code></td>
+                                                                <td>Tidak</td>
+                                                                <td><code>{{ now()->year }}</code></td>
+                                                                <td>Tahun arsip surat (default: tahun berjalan). Rentang {{ config('app.start_year', 2025) }}–{{ now()->year }}.</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="card bg-light border">
+                                                    <div class="card-body p-3">
+                                                        <strong class="d-block mb-1 small text-dark">Contoh Response (Tersedia):</strong>
+                                                        <pre class="bg-dark text-white p-2 rounded small mb-2"><code>{
+  "available": true,
+  "message": "Nomor agenda 15 tersedia untuk tahun 2026."
+}</code></pre>
+                                                        <strong class="d-block mb-1 small text-dark">Contoh Response (Sudah Digunakan):</strong>
+                                                        <pre class="bg-dark text-white p-2 rounded small mb-0"><code>{
+  "available": false,
+  "message": "Nomor agenda 15 sudah digunakan pada tahun 2026.",
+  "data": {
+    "id": 1,
+    "nomor_agenda": 15,
+    "nomor_surat": "001/BMKG/VIII/2026",
+    "pengirim": "Stasiun Meteorologi",
+    "perihal": "Laporan Iklim Bulanan",
+    "tanggal_surat": "10/08/2026",
+    "tanggal_diterima": "12/08/2026",
+    "is_deleted": false
+  }
+}</code></pre>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -473,9 +549,10 @@
 
                 <div class="alert alert-secondary mt-3 mb-0">
                     Ambil <code>access_id</code> melalui
-                    <code>GET {{ route('api.v1.references.accesses') }}</code> dan
+                    <code>GET {{ route('api.v1.references.accesses') }}</code>,
                     <code>filelist_id</code> melalui
-                    <code>GET {{ route('api.v1.references.active-filelists') }}</code>.
+                    <code>GET {{ route('api.v1.references.active-filelists') }}</code>, dan cek ketersediaan nomor agenda melalui
+                    <code>GET {{ route('api.v1.surat.masuk.cek-agenda') }}</code>.
                     Detail seluruh berkas tersedia melalui
                     <code>GET {{ route('api.v1.berkas.index') }}</code>.
                 </div>

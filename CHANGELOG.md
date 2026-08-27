@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-08-27
+
+### Added
+
+- Menambahkan endpoint REST API (`GET /api/v1/surat/masuk/cek-agenda`) dengan autentikasi Sanctum Bearer Token (`abilities: surat:create`) untuk memeriksa ketersediaan nomor agenda surat masuk berdasarkan nomor dan tahun.
+- Menambahkan endpoint web AJAX dan antarmuka interaktif pengecekan ketersediaan **Nomor Agenda** surat masuk secara real-time pada form tambah (`/surat/masuk/tambah`) dan edit (`/surat/masuk/edit/{id}`) naskah masuk, lengkap dengan peringatan dini duplikasi nomor pada tahun aktif, rincian data surat terkait, serta opsi untuk langsung melihat arsip surat yang sudah ada.
+
 ## [0.11.1] - 2026-08-27
 
 ### Added

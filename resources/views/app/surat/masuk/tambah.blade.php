@@ -19,8 +19,16 @@
                 </div>
                 <div class="form-group">
                     <label for="nomorAgenda">Nomor Agenda</label>
-                    <input type="number" class="form-control" id="nomorAgenda" placeholder="Masukkan Nomor Agenda"
-                        name="nomorAgenda" value="{{ old('nomorAgenda') }}" REQUIRED>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="nomorAgenda" placeholder="Masukkan Nomor Agenda"
+                            name="nomorAgenda" value="{{ old('nomorAgenda') }}" min="1" REQUIRED>
+                        <div class="input-group-append" id="agendaCheckingSpinner" style="display: none;">
+                            <span class="input-group-text bg-white">
+                                <i class="fa fa-spinner fa-spin text-primary"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="agendaFeedback" class="mt-2" style="display: none;"></div>
                     @error('nomorAgenda')
                         <div class="text-danger mt-2">{{ $message }}</div>
                     @enderror
@@ -148,16 +156,91 @@
 
             function syncSrikandiFields() {
                 if ($('#isSrikandi').is(':checked')) {
-                    $('#nomorAgenda').parent().hide();
-                    $('#pemberkasan').parent().hide();
+                    $('#nomorAgenda').closest('.form-group').hide();
+                    $('#pemberkasan').closest('.form-group').hide();
                     $('#nomorAgenda').val('').prop('required', false);
+                    $('#agendaFeedback').hide().empty();
+                    $('#agendaCheckingSpinner').hide();
                     $('#pemberkasan').val($('#pemberkasan option:first').val()).trigger('change');
                 } else {
-                    $('#nomorAgenda').parent().show();
-                    $('#pemberkasan').parent().show();
+                    $('#nomorAgenda').closest('.form-group').show();
+                    $('#pemberkasan').closest('.form-group').show();
                     $('#nomorAgenda').prop('required', true);
+                    if ($('#nomorAgenda').val()) {
+                        checkNomorAgenda($('#nomorAgenda').val());
+                    }
                 }
             }
+
+            var agendaCheckTimeout = null;
+
+            function escapeHtml(str) {
+                if (str === null || str === undefined) return '-';
+                return $('<div>').text(str).html();
+            }
+
+            function checkNomorAgenda(nomor) {
+                if ($('#isSrikandi').is(':checked')) {
+                    $('#agendaFeedback').hide().empty();
+                    $('#agendaCheckingSpinner').hide();
+                    return;
+                }
+
+                nomor = $.trim(nomor);
+                if (!nomor || parseInt(nomor, 10) < 1) {
+                    $('#agendaFeedback').hide().empty();
+                    $('#agendaCheckingSpinner').hide();
+                    return;
+                }
+
+                $('#agendaCheckingSpinner').show();
+
+                $.ajax({
+                    url: `{{ route('masuk.cek-agenda') }}`,
+                    type: 'GET',
+                    data: {
+                        nomor_agenda: nomor
+                    },
+                    success: function (res) {
+                        $('#agendaCheckingSpinner').hide();
+                        if (res.available) {
+                            $('#agendaFeedback')
+                                .html('<div class="alert alert-success py-2 px-3 mb-0 small d-flex align-items-center"><i class="fa fa-check-circle mr-2 text-success"></i> <span>' + escapeHtml(res.message) + '</span></div>')
+                                .show();
+                        } else {
+                            var d = res.data;
+                            var html = '<div class="alert alert-warning py-2 px-3 mb-0 small shadow-sm border">';
+                            html += '<div class="font-weight-bold text-dark mb-1"><i class="fa fa-exclamation-triangle text-warning mr-1"></i> ' + escapeHtml(res.message) + '</div>';
+                            if (d) {
+                                html += '<div class="text-muted mb-2">';
+                                html += '<div><strong>No. Surat:</strong> ' + escapeHtml(d.nomor_surat) + ' | <strong>Tgl Diterima:</strong> ' + escapeHtml(d.tanggal_diterima) + '</div>';
+                                html += '<div><strong>Pengirim:</strong> ' + escapeHtml(d.pengirim) + '</div>';
+                                html += '<div><strong>Perihal:</strong> ' + escapeHtml(d.perihal) + '</div>';
+                                if (d.is_deleted) {
+                                    html += '<div class="text-danger mt-1"><i class="fa fa-trash-alt mr-1"></i> <em>Status: Berada di tong sampah (soft-deleted).</em></div>';
+                                }
+                                html += '</div>';
+                                if (d.detail_url) {
+                                    html += '<a href="' + d.detail_url + '" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline-primary"><i class="fa fa-eye mr-1"></i> Lihat Data Surat Ini (Tab Baru)</a>';
+                                }
+                            }
+                            html += '</div>';
+                            $('#agendaFeedback').html(html).show();
+                        }
+                    },
+                    error: function () {
+                        $('#agendaCheckingSpinner').hide();
+                    }
+                });
+            }
+
+            $('#nomorAgenda').on('input change', function () {
+                var val = $(this).val();
+                clearTimeout(agendaCheckTimeout);
+                agendaCheckTimeout = setTimeout(function () {
+                    checkNomorAgenda(val);
+                }, 350);
+            });
 
             $('#pemberkasan').select2({
                 matcher: matchOptgroup,

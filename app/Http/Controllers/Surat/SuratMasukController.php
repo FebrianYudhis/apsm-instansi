@@ -14,6 +14,8 @@ use App\Services\DocumentService;
 use App\Services\FilelistMutationLock;
 use App\Services\SuratFilterQuery;
 use App\Services\SuratPencatatanExporter;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +27,55 @@ use Throwable;
 class SuratMasukController extends Controller
 {
     public function __construct(private ActiveYear $activeYear) {}
+
+    public function cekAgenda(Request $request): JsonResponse
+    {
+        $request->validate([
+            'nomor_agenda' => ['required', 'integer', 'min:1'],
+            'ignore_id' => ['nullable', 'integer'],
+        ]);
+
+        $nomorAgenda = (int) $request->input('nomor_agenda');
+        $activeYear = $this->activeYear->current();
+        $ignoreId = $request->input('ignore_id');
+
+        $query = Incoming::withTrashed()
+            ->where('nomor_agenda', $nomorAgenda)
+            ->where('tahun', $activeYear);
+
+        if (! empty($ignoreId)) {
+            $query->where('id', '!=', $ignoreId);
+        }
+
+        $existing = $query->first();
+
+        if (! $existing) {
+            return response()->json([
+                'available' => true,
+                'message' => "Nomor agenda {$nomorAgenda} tersedia untuk tahun kerja {$activeYear}.",
+            ]);
+        }
+
+        $isDeleted = $existing->trashed();
+
+        return response()->json([
+            'available' => false,
+            'message' => $isDeleted
+                ? "Nomor agenda {$nomorAgenda} sudah terpakai oleh arsip surat yang berada di tempat sampah (soft-deleted) pada tahun {$activeYear}."
+                : "Nomor agenda {$nomorAgenda} sudah digunakan pada tahun {$activeYear}.",
+            'data' => [
+                'id' => $existing->id,
+                'nomor_agenda' => $existing->nomor_agenda,
+                'nomor_surat' => $existing->nomor_surat,
+                'pengirim' => $existing->pengirim,
+                'perihal' => $existing->perihal,
+                'tanggal_surat' => $existing->tanggal_surat ? Carbon::parse($existing->tanggal_surat)->format('d/m/Y') : '-',
+                'tanggal_diterima' => $existing->tanggal_diterima ? Carbon::parse($existing->tanggal_diterima)->format('d/m/Y') : '-',
+                'is_deleted' => $isDeleted,
+                'detail_url' => $isDeleted ? null : route('surat.detailItem', ['masuk', $existing->id]),
+            ],
+        ]);
+    }
 
     public function tambah()
     {
@@ -46,35 +97,7 @@ class SuratMasukController extends Controller
             request()->merge(['pemberkasan' => null]);
         }
 
-        request()->validate([
-            'isSrikandi' => ['sometimes', 'boolean'],
-            'nomorAgenda' => $isSrikandi
-                ? ['nullable']
-                : ['required', 'integer', 'min:1'],
-            'tanggalDiterima' => ['required', 'date'],
-            'tanggalSurat' => ['nullable', 'date'],
-            'nomorSurat' => ['required', 'string', 'max:255'],
-            'pengirim' => ['required', 'string', 'max:65535'],
-            'perihal' => ['required', 'string', 'max:65535'],
-            'sifat' => ['required', 'integer', Rule::exists('accesses', 'id')],
-            'pemberkasan' => [
-                'nullable',
-                'integer',
-                Rule::exists('filelists', 'id')->where(function ($query) {
-                    $query->where('status_id', 1)
-                        ->whereNull('alih_media_status_id')
-                        ->whereNull('deleted_at');
-                }),
-            ],
-            'berkas' => [
-                'required',
-                'file',
-                'mimes:pdf',
-                'mimetypes:application/pdf,application/x-pdf',
-                'max:'.config('documents.max_upload_kb'),
-                new ValidPdf,
-            ],
-        ]);
+        request()->validate($this->incomingValidationRules(false, $isSrikandi));
 
         if ($isSrikandi) {
             $nomorAgenda = null;
@@ -238,35 +261,7 @@ class SuratMasukController extends Controller
             request()->merge(['pemberkasan' => null]);
         }
 
-        request()->validate([
-            'isSrikandi' => ['sometimes', 'boolean'],
-            'nomorAgenda' => $isSrikandi
-                ? ['nullable']
-                : ['required', 'integer', 'min:1'],
-            'tanggalDiterima' => ['required', 'date'],
-            'tanggalSurat' => ['nullable', 'date'],
-            'nomorSurat' => ['required', 'string', 'max:255'],
-            'pengirim' => ['required', 'string', 'max:65535'],
-            'perihal' => ['required', 'string', 'max:65535'],
-            'sifat' => ['required', 'integer', Rule::exists('accesses', 'id')],
-            'pemberkasan' => [
-                'nullable',
-                'integer',
-                Rule::exists('filelists', 'id')->where(function ($query) {
-                    $query->where('status_id', 1)
-                        ->whereNull('alih_media_status_id')
-                        ->whereNull('deleted_at');
-                }),
-            ],
-            'berkas' => [
-                'nullable',
-                'file',
-                'mimes:pdf',
-                'mimetypes:application/pdf,application/x-pdf',
-                'max:'.config('documents.max_upload_kb'),
-                new ValidPdf,
-            ],
-        ]);
+        request()->validate($this->incomingValidationRules(true, $isSrikandi));
 
         if ($isSrikandi) {
             $nomorAgenda = null;
@@ -364,6 +359,37 @@ class SuratMasukController extends Controller
         Alert::success('Berhasil', 'Surat Masuk Berhasil Diubah');
 
         return redirect()->route('surat.masuk');
+    }
+
+    private function incomingValidationRules(bool $isEdit, bool $isSrikandi): array
+    {
+        return [
+            'isSrikandi' => ['sometimes', 'boolean'],
+            'nomorAgenda' => $isSrikandi ? ['nullable'] : ['required', 'integer', 'min:1'],
+            'tanggalDiterima' => ['required', 'date'],
+            'tanggalSurat' => ['nullable', 'date'],
+            'nomorSurat' => ['required', 'string', 'max:255'],
+            'pengirim' => ['required', 'string', 'max:65535'],
+            'perihal' => ['required', 'string', 'max:65535'],
+            'sifat' => ['required', 'integer', Rule::exists('accesses', 'id')],
+            'pemberkasan' => [
+                'nullable',
+                'integer',
+                Rule::exists('filelists', 'id')->where(function ($query) {
+                    $query->where('status_id', 1)
+                        ->whereNull('alih_media_status_id')
+                        ->whereNull('deleted_at');
+                }),
+            ],
+            'berkas' => array_values(array_filter([
+                $isEdit ? 'nullable' : 'required',
+                'file',
+                'mimes:pdf',
+                'mimetypes:application/pdf,application/x-pdf',
+                'max:'.config('documents.max_upload_kb'),
+                new ValidPdf,
+            ])),
+        ];
     }
 
     private function isValidPemberkasanTujuan($filelistId): bool

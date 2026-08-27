@@ -171,6 +171,65 @@ it('returns reference data needed to create a letter', function () {
         ->assertJsonPath('data.0.classification.code', 'API.01');
 });
 
+it('checks agenda number availability via API and returns true when free', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('API Check', ['surat:create'])->plainTextToken;
+
+    $this->withToken($token)
+        ->getJson(route('api.v1.surat.masuk.cek-agenda', ['nomor_agenda' => 77, 'tahun' => 2026]))
+        ->assertSuccessful()
+        ->assertJson([
+            'available' => true,
+        ]);
+});
+
+it('returns false with details when agenda number is used via API', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('API Check', ['surat:create'])->plainTextToken;
+    $access = Access::create(['sifat_akses' => 'Biasa']);
+
+    $surat = Incoming::create([
+        'nomor_agenda' => 88,
+        'tanggal_diterima' => '2026-08-12',
+        'nomor_surat' => 'API-001/2026',
+        'pengirim' => 'Pusat Data',
+        'tanggal_surat' => '2026-08-10',
+        'perihal' => 'Pengujian API Check',
+        'url' => 'dokumen/masuk/api-test.pdf',
+        'tahun' => 2026,
+        'is_srikandi' => false,
+        'access_id' => $access->getKey(),
+    ]);
+
+    $this->withToken($token)
+        ->getJson(route('api.v1.surat.masuk.cek-agenda', ['nomor_agenda' => 88, 'tahun' => 2026]))
+        ->assertSuccessful()
+        ->assertJson([
+            'available' => false,
+            'data' => [
+                'id' => $surat->id,
+                'nomor_agenda' => 88,
+                'nomor_surat' => 'API-001/2026',
+                'pengirim' => 'Pusat Data',
+                'perihal' => 'Pengujian API Check',
+                'is_deleted' => false,
+            ],
+        ]);
+});
+
+it('validates agenda number and year on API check', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('API Check', ['surat:create'])->plainTextToken;
+
+    $this->withToken($token)
+        ->getJson(route('api.v1.surat.masuk.cek-agenda'))
+        ->assertJsonValidationErrors(['nomor_agenda']);
+
+    $this->withToken($token)
+        ->getJson(route('api.v1.surat.masuk.cek-agenda', ['nomor_agenda' => 1, 'tahun' => 2000]))
+        ->assertJsonValidationErrors(['tahun']);
+});
+
 function validApiPdf(string $name): UploadedFile
 {
     return UploadedFile::fake()->createWithContent(

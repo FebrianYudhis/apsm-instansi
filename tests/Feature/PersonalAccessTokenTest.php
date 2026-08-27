@@ -30,6 +30,7 @@ it('shows only tokens owned by the authenticated user', function () {
         ->assertSee('data-target="#apiGuideIncoming"', false)
         ->assertSee('data-target="#apiGuideIncomingSrikandi"', false)
         ->assertSee('data-target="#apiGuideIncomingManual"', false)
+        ->assertSee('data-target="#apiGuideIncomingCekAgenda"', false)
         ->assertSee('data-target="#apiGuideOutgoing"', false)
         ->assertSee('data-target="#apiGuideOutgoingSrikandi"', false)
         ->assertSee('data-target="#apiGuideOutgoingManual"', false)

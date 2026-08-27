@@ -95,6 +95,7 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
     Route::post('surat/alih-media/diproses/ulangi/{id}', [AlihMediaController::class, 'ulangi'])->name('alih-media.diproses.ulangi');
     Route::post('surat/alih-media/diproses/tutup-semua', [AlihMediaController::class, 'tutupSemua'])->name('alih-media.diproses.tutup-semua');
 
+    Route::get('surat/masuk/cek-agenda', [SuratMasukController::class, 'cekAgenda'])->name('masuk.cek-agenda');
     Route::get('surat/masuk/tambah', [SuratMasukController::class, 'tambah'])->name('masuk.tambah');
     Route::post('surat/masuk/tambah', [SuratMasukController::class, 'store']);
     Route::get('surat/masuk/edit/{id}', [SuratMasukController::class, 'edit'])->name('masuk.edit');
