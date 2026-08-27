@@ -258,7 +258,15 @@ class FilelistOperationService
         $outcomingIds = [];
 
         foreach ($items as $item) {
-            [$type, $id] = explode(':', $item);
+            if (! is_string($item) || ! str_contains($item, ':')) {
+                continue;
+            }
+
+            [$type, $id] = explode(':', $item, 2);
+
+            if (! is_numeric($id)) {
+                continue;
+            }
 
             if ($type === 'masuk') {
                 $incomingIds[] = (int) $id;

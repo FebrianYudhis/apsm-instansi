@@ -64,9 +64,8 @@ class BerkasExportController extends Controller
         $jenisExport = $this->resolveJenisExport($request);
         $statusId = (int) $request->input('status_id');
         $hasStatusFilter = $request->filled('status_id');
-        $isStatusAktif = ! $hasStatusFilter || $statusId === 1;
         $isStatusInaktif = $hasStatusFilter && $statusId === 3;
-        $isStatusAktifLike = ! $hasStatusFilter || in_array($statusId, [1, 2, 4, 5, 6, 7], true);
+        $isStandardArchiveFormat = ! $hasStatusFilter || in_array($statusId, [1, 3], true);
         $kodeKlasifikasiLabel = 'Semua';
         $statusLabel = 'Semua';
         $keteranganAkhirLabel = 'Semua';
@@ -179,7 +178,8 @@ class BerkasExportController extends Controller
             $fileName = 'daftar-isi-berkas-'.now()->format('Ymd-His').'.xlsx';
             $sheet->setTitle('Daftar Isi Berkas');
             $sheet->setCellValue('A1', 'DAFTAR ISI BERKAS');
-            if ($isStatusAktifLike || $isStatusInaktif) {
+
+            if ($isStandardArchiveFormat) {
                 $headers = [
                     'A' => 'Nomor Urut',
                     'B' => 'Kode Klasifikasi',
@@ -223,7 +223,8 @@ class BerkasExportController extends Controller
             $fileName = 'daftar-berkas-'.now()->format('Ymd-His').'.xlsx';
             $sheet->setTitle('Daftar Berkas');
             $sheet->setCellValue('A1', 'DAFTAR BERKAS');
-            if ($isStatusAktifLike || $isStatusInaktif) {
+
+            if ($isStandardArchiveFormat) {
                 $headers = [
                     'A' => 'Nomor Urut',
                     'B' => 'Kode Klasifikasi',
@@ -331,54 +332,42 @@ class BerkasExportController extends Controller
                     ]]);
                 }
 
-                if ($isStatusAktifLike || $isStatusInaktif) {
-                    $kodeKlasifikasiBerkas = (string) (optional($berkas->classification)->kode_klasifikasi ?? '-');
+                $kodeKlasifikasiBerkas = (string) (optional($berkas->classification)->kode_klasifikasi ?? '-');
+                $startRow = $row;
+                $itemNo = 1;
 
-                    $startRow = $row;
-                    $itemNo = 1;
-
+                if ($isStandardArchiveFormat) {
                     foreach ($items as $item) {
-                        if ($isStatusAktifLike || $isStatusInaktif) {
-                            $tanggalSurat = $this->formatTanggalIndonesia($item['tanggal_item'] ?? '-');
-                            $penciptaSurat = (string) ($item['pencipta_arsip'] ?? '-');
-                            $tujuanSurat = (string) ($item['tujuan_surat'] ?? '-');
-                            $nomorSurat = (string) ($item['nomor_naskah'] ?? '-');
-                            $perihal = (string) ($item['perihal'] ?? '-');
-                            $uraianInformasi = "Surat dari {$penciptaSurat} kepada {$tujuanSurat} nomor {$nomorSurat} tanggal {$tanggalSurat} tentang {$perihal}";
+                        $tanggalSurat = $this->formatTanggalIndonesia($item['tanggal_item'] ?? '-');
+                        $penciptaSurat = (string) ($item['pencipta_arsip'] ?? '-');
+                        $tujuanSurat = (string) ($item['tujuan_surat'] ?? '-');
+                        $nomorSurat = (string) ($item['nomor_naskah'] ?? '-');
+                        $perihal = (string) ($item['perihal'] ?? '-');
+                        $uraianInformasi = "Surat dari {$penciptaSurat} kepada {$tujuanSurat} nomor {$nomorSurat} tanggal {$tanggalSurat} tentang {$perihal}";
 
-                            $sheet->setCellValue('J'.$row, $itemNo++);
-                            $sheet->setCellValue('K'.$row, $penciptaSurat);
-                            $sheet->setCellValue('L'.$row, $tujuanSurat);
-                            $sheet->setCellValue('M'.$row, $nomorSurat);
-                            $sheet->setCellValue('N'.$row, $perihal);
-                            $sheet->setCellValue('O'.$row, $uraianInformasi);
-                            $sheet->setCellValue('P'.$row, $tanggalSurat);
-                            $sheet->setCellValue('Q'.$row, 'Asli');
-                            $sheet->setCellValue('R'.$row, '');
-                            $sheet->setCellValue('S'.$row, (string) ($item['skkad'] ?? '-'));
-                        } else {
-                            $sheet->setCellValue('I'.$row, $itemNo++);
-                            $sheet->setCellValue('J'.$row, (string) ($item['nomor_naskah'] ?? '-'));
-                            $sheet->setCellValue('K'.$row, $this->formatTanggalIndonesia($item['tanggal_item'] ?? '-'));
-                            $sheet->setCellValue('L'.$row, (string) ($item['uraian'] ?? '-'));
-                        }
+                        $sheet->setCellValue('J'.$row, $itemNo++);
+                        $sheet->setCellValue('K'.$row, $penciptaSurat);
+                        $sheet->setCellValue('L'.$row, $tujuanSurat);
+                        $sheet->setCellValue('M'.$row, $nomorSurat);
+                        $sheet->setCellValue('N'.$row, $perihal);
+                        $sheet->setCellValue('O'.$row, $uraianInformasi);
+                        $sheet->setCellValue('P'.$row, $tanggalSurat);
+                        $sheet->setCellValue('Q'.$row, 'Asli');
+                        $sheet->setCellValue('R'.$row, '');
+                        $sheet->setCellValue('S'.$row, (string) ($item['skkad'] ?? '-'));
                         $row++;
                     }
 
                     $endRow = $row - 1;
-                    if ($isStatusAktifLike || $isStatusInaktif) {
-                        $sheet->setCellValue('A'.$startRow, $nomor++);
-                        $sheet->setCellValue('B'.$startRow, $kodeKlasifikasiBerkas);
-                        $sheet->setCellValue('C'.$startRow, $penciptaArsip);
-                        $sheet->setCellValue('D'.$startRow, (string) ($berkas->nama_berkas ?? '-'));
-                        $sheet->setCellValue('E'.$startRow, $jumlahIsiBerkas);
-                        $sheet->setCellValue('F'.$startRow, $isStatusInaktif ? '1' : 'Filling Cabinet');
-                        $sheet->setCellValue('G'.$startRow, (string) ($berkas->retensi_aktif ?? '-'));
-                        $sheet->setCellValue('H'.$startRow, (string) ($berkas->retensi_inaktif ?? '-'));
-                        $sheet->setCellValue('I'.$startRow, (string) ($berkas->keterangan_akhir ?? '-'));
-                    } else {
-                        $sheet->setCellValue('I'.$startRow, (string) ($berkas->keterangan_akhir ?? '-'));
-                    }
+                    $sheet->setCellValue('A'.$startRow, $nomor++);
+                    $sheet->setCellValue('B'.$startRow, $kodeKlasifikasiBerkas);
+                    $sheet->setCellValue('C'.$startRow, $penciptaArsip);
+                    $sheet->setCellValue('D'.$startRow, (string) ($berkas->nama_berkas ?? '-'));
+                    $sheet->setCellValue('E'.$startRow, $jumlahIsiBerkas);
+                    $sheet->setCellValue('F'.$startRow, $isStatusInaktif ? '1' : 'Filling Cabinet');
+                    $sheet->setCellValue('G'.$startRow, (string) ($berkas->retensi_aktif ?? '-'));
+                    $sheet->setCellValue('H'.$startRow, (string) ($berkas->retensi_inaktif ?? '-'));
+                    $sheet->setCellValue('I'.$startRow, (string) ($berkas->keterangan_akhir ?? '-'));
 
                     if ($endRow > $startRow) {
                         foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'] as $column) {
@@ -386,9 +375,6 @@ class BerkasExportController extends Controller
                         }
                     }
                 } else {
-                    $startRow = $row;
-                    $itemNo = 1;
-
                     foreach ($items as $item) {
                         $sheet->setCellValue('H'.$row, $itemNo++);
                         $sheet->setCellValue('I'.$row, (string) ($item['jenis_naskah'] ?? '-'));
@@ -402,7 +388,7 @@ class BerkasExportController extends Controller
 
                     $endRow = $row - 1;
                     $sheet->setCellValue('A'.$startRow, $nomor++);
-                    $sheet->setCellValue('B'.$startRow, (string) (optional($berkas->classification)->kode_klasifikasi ?? '-'));
+                    $sheet->setCellValue('B'.$startRow, $kodeKlasifikasiBerkas);
                     $sheet->setCellValue('C'.$startRow, (string) ($berkas->nama_berkas ?? '-'));
                     $sheet->setCellValue('D'.$startRow, (string) (optional($berkas->status)->nama_status ?? '-'));
                     $sheet->setCellValue('E'.$startRow, (string) ($berkas->retensi_aktif ?? '-'));
@@ -419,63 +405,26 @@ class BerkasExportController extends Controller
                 $totalIsi = $berkas->incomings->count() + $berkas->outcomings->count();
                 $kodeKlasifikasiBerkas = (string) (optional($berkas->classification)->kode_klasifikasi ?? '-');
 
-                if ($isStatusAktifLike || $isStatusInaktif) {
-                    $items = collect();
-
-                    foreach ($berkas->incomings as $incoming) {
-                        $items->push([
-                            'tanggal_item' => $incoming->tanggal_surat,
-                            'nomor_naskah' => $incoming->nomor_surat,
-                        ]);
-                    }
-
-                    foreach ($berkas->outcomings as $outcoming) {
-                        $items->push([
-                            'tanggal_item' => $outcoming->tanggal_surat,
-                            'nomor_naskah' => $outcoming->nomor_surat,
-                        ]);
-                    }
-
-                    $items = $items->filter(function ($item) {
-                        return ! empty($item['tanggal_item']);
-                    })->sortBy([
-                        ['tanggal_item', 'asc'],
-                        ['nomor_naskah', 'asc'],
-                    ])->values();
-
+                if ($isStandardArchiveFormat) {
                     $sheet->setCellValue('A'.$row, $nomor++);
-                    if ($isStatusInaktif) {
-                        $sheet->setCellValue('B'.$row, $kodeKlasifikasiBerkas);
-                        $sheet->setCellValue('C'.$row, $penciptaArsip);
-                        $sheet->setCellValue('D'.$row, (string) ($berkas->nama_berkas ?? '-'));
-                        $sheet->setCellValue('E'.$row, $totalIsi);
-                        $sheet->setCellValue('F'.$row, '1');
-                        $sheet->setCellValue('G'.$row, (string) ($berkas->retensi_aktif ?? '-'));
-                        $sheet->setCellValue('H'.$row, (string) ($berkas->retensi_inaktif ?? '-'));
-                        $sheet->setCellValue('I'.$row, (string) ($berkas->keterangan_akhir ?? '-'));
-                    } else {
-                        $sheet->setCellValue('B'.$row, $kodeKlasifikasiBerkas);
-                        $sheet->setCellValue('C'.$row, $penciptaArsip);
-                        $sheet->setCellValue('D'.$row, (string) ($berkas->nama_berkas ?? '-'));
-                        $sheet->setCellValue('E'.$row, $totalIsi);
-                        $sheet->setCellValue('F'.$row, 'Filling Cabinet');
-                        $sheet->setCellValue('G'.$row, (string) ($berkas->retensi_aktif ?? '-'));
-                        $sheet->setCellValue('H'.$row, (string) ($berkas->retensi_inaktif ?? '-'));
-                        $sheet->setCellValue('I'.$row, (string) ($berkas->keterangan_akhir ?? '-'));
-                    }
-                    $row++;
-
-                    continue;
+                    $sheet->setCellValue('B'.$row, $kodeKlasifikasiBerkas);
+                    $sheet->setCellValue('C'.$row, $penciptaArsip);
+                    $sheet->setCellValue('D'.$row, (string) ($berkas->nama_berkas ?? '-'));
+                    $sheet->setCellValue('E'.$row, $totalIsi);
+                    $sheet->setCellValue('F'.$row, $isStatusInaktif ? '1' : 'Filling Cabinet');
+                    $sheet->setCellValue('G'.$row, (string) ($berkas->retensi_aktif ?? '-'));
+                    $sheet->setCellValue('H'.$row, (string) ($berkas->retensi_inaktif ?? '-'));
+                    $sheet->setCellValue('I'.$row, (string) ($berkas->keterangan_akhir ?? '-'));
+                } else {
+                    $sheet->setCellValue('A'.$row, $nomor++);
+                    $sheet->setCellValue('B'.$row, $kodeKlasifikasiBerkas);
+                    $sheet->setCellValue('C'.$row, (string) ($berkas->nama_berkas ?? '-'));
+                    $sheet->setCellValue('D'.$row, (string) (optional($berkas->status)->nama_status ?? '-'));
+                    $sheet->setCellValue('E'.$row, $totalIsi);
+                    $sheet->setCellValue('F'.$row, (string) ($berkas->retensi_aktif ?? '-'));
+                    $sheet->setCellValue('G'.$row, (string) ($berkas->retensi_inaktif ?? '-'));
+                    $sheet->setCellValue('H'.$row, (string) ($berkas->keterangan_akhir ?? '-'));
                 }
-
-                $sheet->setCellValue('A'.$row, $nomor++);
-                $sheet->setCellValue('B'.$row, $kodeKlasifikasiBerkas);
-                $sheet->setCellValue('C'.$row, (string) ($berkas->nama_berkas ?? '-'));
-                $sheet->setCellValue('D'.$row, (string) (optional($berkas->status)->nama_status ?? '-'));
-                $sheet->setCellValue('E'.$row, $totalIsi);
-                $sheet->setCellValue('F'.$row, (string) ($berkas->retensi_aktif ?? '-'));
-                $sheet->setCellValue('G'.$row, (string) ($berkas->retensi_inaktif ?? '-'));
-                $sheet->setCellValue('H'.$row, (string) ($berkas->keterangan_akhir ?? '-'));
                 $row++;
             }
         }
@@ -519,17 +468,23 @@ class BerkasExportController extends Controller
                 ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             if ($jenisExport === 'daftar_isi_berkas') {
-                foreach (($isStatusAktifLike || $isStatusInaktif) ? ['A', 'E', 'G', 'H', 'J', 'P'] : ['H', 'K'] as $centerColumn) {
+                $centerCols = $isStandardArchiveFormat
+                    ? ['A', 'E', 'G', 'H', 'J', 'P']
+                    : ['A', 'E', 'F', 'H', 'I', 'K'];
+
+                foreach ($centerCols as $centerColumn) {
                     $sheet->getStyle($centerColumn.($headerRow + 1).':'.$centerColumn.$lastRow)
                         ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 }
             } else {
-                $sheet->getStyle('A'.($headerRow + 1).':A'.$lastRow)
-                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle((($isStatusAktifLike || $isStatusInaktif) ? 'B' : 'A').($headerRow + 1).':'.(($isStatusAktifLike || $isStatusInaktif) ? 'B' : 'A').$lastRow)
-                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle((($isStatusAktifLike || $isStatusInaktif) ? 'F' : 'E').($headerRow + 1).':'.(($isStatusAktifLike || $isStatusInaktif) ? 'F' : 'E').$lastRow)
-                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $centerCols = $isStandardArchiveFormat
+                    ? ['A', 'B', 'F']
+                    : ['A', 'B', 'D', 'F', 'G'];
+
+                foreach ($centerCols as $centerColumn) {
+                    $sheet->getStyle($centerColumn.($headerRow + 1).':'.$centerColumn.$lastRow)
+                        ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                }
             }
         }
 

@@ -4,6 +4,25 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-08-27
+
+### Changed
+
+- Menyempurnakan logika ekspor Excel pada modul Berkas (`/surat/berkas/export/excel`) dengan membagi dua format spesifikasi kearsipan:
+    - **Standar Kearsipan ANRI (19 Kolom Daftar Isi Berkas / 9 Kolom Daftar Berkas)**: Digunakan untuk berkas berstatus **Aktif**, **Inaktif**, maupun ekspor seluruh status tanpa filter.
+    - **Daftar Rekapitulasi Usulan & Tindakan Penilaian (14 Kolom Daftar Isi Berkas / 8 Kolom Daftar Berkas)**: Digunakan untuk berkas dengan status usulan/tindakan (_Usul Pindah_, _Usul Musnah_, _Musnah_, _Usul Permanen_, dan _Permanen_), dilengkapi kolom _Status Berkas_, _Jenis Naskah_, serta _Identitas Naskah_.
+- Memperbarui singkatan header kolom F pada Ekspor Excel Pencatatan Surat Keluar menjadi **SKKAD** (_Sistem Klasifikasi Keamanan dan Akses Arsip Dinamis_).
+
+### Fixed
+
+- Memperbaiki seleksi opsi default `-Kosongkan-` pada dropdown Pemberkasan di form edit Surat Masuk (`/surat/masuk/edit/{id}`) saat validasi gagal agar tidak hilang ketika memuat data input sebelumnya (`old()`).
+- Memperbaiki definisi route POST verifikasi dokumen tamu dari `guest/buka/` menjadi `guest/buka` (menghapus trailing slash) demi kepatuhan standar route Laravel.
+- Menambahkan penanganan defensif pada pemisahan token ID surat (`separateLetterIds`) di `FilelistOperationService` untuk mencegah risiko error _undefined array key_ ketika menerima format token yang tidak terduga.
+
+### Added
+
+- Menambahkan rangkaian pengujian otomatis komprehensif (`tests/Feature/BerkasExportTest.php`) untuk memvalidasi output spreadsheet 19 kolom, 9 kolom, dan 14 kolom pada berbagai filter status berkas, serta pengujian regresi keamanan dan pelepasan berkas.
+
 ## [0.12.1] - 2026-08-27
 
 ### Added

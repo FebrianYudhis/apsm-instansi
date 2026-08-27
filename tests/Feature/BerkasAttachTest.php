@@ -7,6 +7,7 @@ use App\Models\Incoming;
 use App\Models\Outcoming;
 use App\Models\Status;
 use App\Models\User;
+use App\Services\FilelistOperationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
@@ -236,6 +237,10 @@ test('duplicate and malformed selection keys are rejected before attaching', fun
         ->assertSessionHasErrors('items.0');
 
     expect($incoming->fresh()->filelist_id)->toBeNull();
+
+    $service = app(FilelistOperationService::class);
+    $result = $service->attachLetters($this->filelist->id, ['invalid-without-colon', 'masuk:not-a-number']);
+    expect($result)->toBe(['status' => 'letter_invalid']);
 });
 
 test('letters outside the configured year range reject the whole selection', function () {

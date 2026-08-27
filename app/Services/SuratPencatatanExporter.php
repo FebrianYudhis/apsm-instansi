@@ -136,7 +136,7 @@ class SuratPencatatanExporter
             'C' => 'Nomor Surat',
             'D' => 'Tujuan',
             'E' => 'Perihal',
-            'F' => 'SKKAAD',
+            'F' => 'SKKAD',
         ];
         $headerRow = 7;
         $this->writeHeaders($spreadsheet, $headers, $headerRow);

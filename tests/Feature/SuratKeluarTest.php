@@ -267,6 +267,7 @@ class SuratKeluarTest extends TestCase
         $allSheet = $allWorkbook->getActiveSheet();
 
         $this->assertSame('Jalur Pengiriman: Semua', $allSheet->getCell('A4')->getValue());
+        $this->assertSame('SKKAD', $allSheet->getCell('F7')->getValue());
         $this->assertSame('MANUAL/DI-LUAR', $allSheet->getCell('C8')->getValue());
         $this->assertSame('MANUAL/DALAM', $allSheet->getCell('C9')->getValue());
         $this->assertSame('SRIKANDI/DALAM', $allSheet->getCell('C10')->getValue());

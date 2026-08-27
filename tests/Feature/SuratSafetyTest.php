@@ -150,6 +150,37 @@ class SuratSafetyTest extends TestCase
             ->assertDontSee('Format');
     }
 
+    public function test_guest_buka_route_accepts_post_without_trailing_slash()
+    {
+        Storage::disk('documents')->put('dokumen/masuk/rahasia.pdf', "%PDF-1.4\n%%EOF");
+
+        $restricted = $this->makeIncoming([
+            'nomor_surat' => 'GUEST-MFA-TEST',
+            'access_id' => null,
+            'url' => 'dokumen/masuk/rahasia.pdf',
+        ]);
+
+        $this->post('/guest/buka', [
+            'id' => $restricted->id,
+            'jenis' => 'masuk',
+            'password' => $this->currentOtp(),
+        ])->assertOk()
+            ->assertJsonPath('isSuccess', true)
+            ->assertJsonStructure(['isSuccess', 'url', 'expires_at']);
+    }
+
+    public function test_incoming_edit_page_preserves_empty_pemberkasan_selection()
+    {
+        $this->actingAs($this->user);
+        $incoming = $this->makeIncoming(['filelist_id' => null]);
+
+        $response = $this->get(route('masuk.edit', $incoming->id))->assertOk();
+        $this->assertStringContainsString(
+            '<option value="null" selected>-Kosongkan-</option>',
+            $response->getContent()
+        );
+    }
+
     public function test_incoming_in_alih_media_process_cannot_be_edited_moved_or_deleted()
     {
         $this->actingAs($this->user);

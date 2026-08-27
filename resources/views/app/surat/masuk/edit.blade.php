@@ -89,11 +89,11 @@
                 <div class="form-group">
                     <label for="pemberkasan">Pemberkasan</label>
                     <select class="form-control" id="pemberkasan" name="pemberkasan">
-                        <option value="null" {{ old('pemberkasan', $data['filelist_id']) === null ? 'selected' : '' }}>-Kosongkan-</option>
+                        <option value="null" {{ in_array(old('pemberkasan', $data['filelist_id']), [null, 'null', ''], true) ? 'selected' : '' }}>-Kosongkan-</option>
                         @foreach ($filelist->sortBy(['classification.kode_klasifikasi', 'nama_berkas'])->groupBy(fn ($item) => $item->classification->kode_klasifikasi . ' - ' . ($item->classification->keterangan ?? 'Tanpa Keterangan')) as $namaKlasifikasi => $berkasList)
                             <optgroup label="{{ $namaKlasifikasi }}">
                                 @foreach ($berkasList as $item)
-                                    <option value="{{ $item->id }}" {{ old('pemberkasan', $data['filelist_id']) == $item->id ? 'selected' : '' }}>
+                                    <option value="{{ $item->id }}" {{ (string) old('pemberkasan', $data['filelist_id']) === (string) $item->id ? 'selected' : '' }}>
                                         {{ $item->nama_berkas }}
                                     </option>
                                 @endforeach

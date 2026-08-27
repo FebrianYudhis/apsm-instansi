@@ -162,6 +162,6 @@ Route::get('guest/dokumen-terbatas/{jenis}/{id}/{nama?}', [DocumentController::c
         'id' => '[0-9]+',
         'nama' => '[A-Za-z0-9-]+\.pdf',
     ]);
-Route::post('guest/buka/', [GuestController::class, 'bukaSurat'])
+Route::post('guest/buka', [GuestController::class, 'bukaSurat'])
     ->middleware('throttle:guest-document-mfa')
     ->name('guest.buka');
