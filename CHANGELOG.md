@@ -4,6 +4,12 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.1] - 2026-08-27
+
+### Added
+
+- Menambahkan kolom **Nomor Agenda** pada tabel pemilihan dan pratinjau surat masuk saat melampirkan surat ke berkas (`/surat/berkas/buka/{id}`), serta pada data surat yang belum diberkaskan (`/surat/belum-diberkaskan`).
+
 ## [0.12.0] - 2026-08-27
 
 ### Added

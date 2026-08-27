@@ -35,6 +35,7 @@
                                 <th>Jenis</th>
                                 <th>Tanggal Pencatatan</th>
                                 <th>Tanggal Surat</th>
+                                <th>No. Agenda</th>
                                 <th>Nomor Surat</th>
                                 <th>Pengirim / Tujuan</th>
                                 <th>Perihal</th>

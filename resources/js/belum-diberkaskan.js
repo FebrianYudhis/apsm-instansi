@@ -30,6 +30,13 @@
                 },
                 { data: 'tanggal_pencatatan', name: 'tanggal_pencatatan' },
                 { data: 'tanggal_surat', name: 'tanggal_surat' },
+                {
+                    data: 'nomor_agenda',
+                    name: 'nomor_agenda',
+                    render: function (data) {
+                        return data ? data : '-';
+                    },
+                },
                 { data: 'nomor_surat', name: 'nomor_surat' },
                 { data: 'pihak', name: 'pihak' },
                 { data: 'perihal', name: 'perihal' },

@@ -80,6 +80,7 @@ test('pending filing filter returns only eligible letters for the selected type 
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $eligibleIncoming->id)
         ->assertJsonPath('data.0.jenis', 'masuk')
+        ->assertJsonPath('data.0.nomor_agenda', $eligibleIncoming->nomor_agenda)
         ->assertJsonPath('data.0.tahun', 2025)
         ->assertJsonMissingPath('data.0.url')
         ->assertJsonPath('data.0.preview_url', route('document.admin', [
@@ -96,7 +97,8 @@ test('pending filing filter returns only eligible letters for the selected type 
         ->assertJsonPath('recordsFiltered', 1)
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $eligibleOutgoing->id)
-        ->assertJsonPath('data.0.jenis', 'keluar');
+        ->assertJsonPath('data.0.jenis', 'keluar')
+        ->assertJsonPath('data.0.nomor_agenda', null);
 
     $this->get(
         route('surat.belum-diberkaskan'),

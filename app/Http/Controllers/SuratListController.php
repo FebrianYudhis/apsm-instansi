@@ -73,7 +73,7 @@ class SuratListController extends Controller
         $suratMasuk = Incoming::query()
             ->selectRaw(
                 "id, 'masuk' as jenis, tanggal_diterima as tanggal_pencatatan, ".
-                'tanggal_surat, nomor_surat, pengirim as pihak, perihal, tahun, '.
+                'tanggal_surat, nomor_agenda, nomor_surat, pengirim as pihak, perihal, tahun, '.
                 "CASE WHEN url IS NULL OR url = '' THEN 0 ELSE 1 END as has_pdf"
             )
             ->where('tahun', $tahun)
@@ -81,7 +81,7 @@ class SuratListController extends Controller
         $suratKeluar = Outcoming::query()
             ->selectRaw(
                 "id, 'keluar' as jenis, tanggal_surat as tanggal_pencatatan, ".
-                'tanggal_surat, nomor_surat, tujuan as pihak, perihal, tahun, '.
+                'tanggal_surat, NULL as nomor_agenda, nomor_surat, tujuan as pihak, perihal, tahun, '.
                 "CASE WHEN url IS NULL OR url = '' THEN 0 ELSE 1 END as has_pdf"
             )
             ->where('tahun', $tahun)

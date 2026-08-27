@@ -196,6 +196,7 @@
                 jenis: String(row.jenis),
                 tahun: Number(row.tahun),
                 tanggalSurat: String(row.tanggal_surat || '-'),
+                nomorAgenda: String(row.nomor_agenda || '-'),
                 nomorSurat: String(row.nomor_surat || '-'),
                 pihak: String(row.pihak || '-'),
                 perihal: String(row.perihal || '-'),
@@ -226,6 +227,7 @@
                 });
 
                 $('<td>').text(selection.tanggalSurat).appendTo(row);
+                $('<td>').text(selection.nomorAgenda).appendTo(row);
                 $('<td>').text(selection.nomorSurat).appendTo(row);
                 $('<td>').text(selection.pihak).appendTo(row);
                 subjectLayout.append(
@@ -277,6 +279,13 @@
                         },
                     },
                     {data: 'tanggal_surat', name: 'tanggal_surat'},
+                    {
+                        data: 'nomor_agenda',
+                        name: 'nomor_agenda',
+                        render: function (data) {
+                            return data ? data : '-';
+                        },
+                    },
                     {data: 'nomor_surat', name: 'nomor_surat'},
                     {data: 'pihak', name: 'pihak'},
                     {data: 'perihal', name: 'perihal'},

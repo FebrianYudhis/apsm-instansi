@@ -200,6 +200,7 @@
                                                     <tr>
                                                         <th><input type="checkbox" id="attachSelectAll" aria-label="Pilih semua surat pada halaman ini"></th>
                                                         <th>Tanggal Surat</th>
+                                                        <th>No. Agenda</th>
                                                         <th>Nomor Surat</th>
                                                         <th>Pengirim / Tujuan</th>
                                                         <th>Perihal</th>
@@ -228,6 +229,7 @@
                                                 <thead class="thead-dark">
                                                     <tr>
                                                         <th>Tanggal Surat</th>
+                                                        <th>No. Agenda</th>
                                                         <th>Nomor Surat</th>
                                                         <th>Pengirim / Tujuan</th>
                                                         <th>Perihal</th>
