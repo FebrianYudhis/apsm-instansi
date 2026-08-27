@@ -4,6 +4,12 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.6] - 2026-08-27
+
+### Fixed
+
+- Memperbaiki bug menu aksi (*three-dots dropdown menu*) pada tabel DataTables (Daftar Surat Masuk, Daftar Surat Keluar, Daftar Surat Digital, Daftar Berkas, Daftar Klasifikasi, dll.) yang terpotong (*clipped*) atau berukuran sangat kecil ketika hasil pencarian/filter hanya menampilkan satu atau sedikit baris data, dengan menetapkan tinggi minimum pada kontainer tabel (`.dataTables_scrollBody` dan `.table-responsive`) serta memastikan `z-index` menu dropdown berada di atas elemen lainnya.
+
 ## [0.10.5] - 2026-08-20
 
 ### Changed

@@ -247,6 +247,17 @@ table.dataTable tbody tr:hover {
     color: #ffffff !important;
 }
 
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody,
+.dataTables_scrollBody,
+.card-body > .table-responsive {
+    min-height: 260px;
+}
+
+.table td .dropdown-menu {
+    border-radius: 8px;
+    z-index: 1050;
+}
+
 .list-group-item {
     border-color: var(--apsm-border);
 }
