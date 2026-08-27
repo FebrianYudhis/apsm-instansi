@@ -97,9 +97,18 @@
                                 <a href="{{ route('mfa.index') }}" class="nav-link"><i
                                         class="fa fa-fw fa-qrcode"></i>Pengaturan MFA</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('activity-log') }}" class="nav-link"><i
-                                        class="fa fa-fw fa-list-alt"></i>Log Aktivitas</a>
+                            <li class="nav-item ">
+                                <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false"
+                                    data-target="#submenu-5" aria-controls="submenu-5"><i
+                                        class="fa fa-fw fa-history"></i>Aktivitas</a>
+                                <div id="submenu-5" class="collapse submenu">
+                                    <ul class="nav flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('activity-log.ringkasan') }}">Ringkasan Aktivitas</a>
+                                            <a class="nav-link" href="{{ route('activity-log') }}">Log Aktivitas</a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
                             <li class="nav-item ">
                                 <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false"

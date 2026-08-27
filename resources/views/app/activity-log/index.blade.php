@@ -24,7 +24,7 @@
 @push('js')
     <script>
         $(document).ready(function () {
-            $('#datatabel').DataTable({
+            var table = $('#datatabel').DataTable({
                 scrollX: true,
                 autoWidth: false,
                 paging: true,
@@ -34,6 +34,10 @@
                     url: `{{ route('activity-log') }}`,
                     data: function (d) {
                         d.user_id = $('#filterPelaku').val();
+                        d.subject_type = $('#filterKategori').val();
+                        d.event = $('#filterAksi').val();
+                        d.bulan = $('#filterBulan').val();
+                        d.tahun = $('#filterTahun').val();
                     }
                 },
                 columns: [
@@ -60,8 +64,17 @@
                 }
             });
 
-            $('#filterPelaku').change(function() {
-                $('#datatabel').DataTable().ajax.reload();
+            $('#filterPelaku, #filterKategori, #filterAksi, #filterBulan, #filterTahun').change(function() {
+                table.ajax.reload();
+            });
+
+            $('#btnResetFilter').click(function() {
+                $('#filterPelaku').val('');
+                $('#filterKategori').val('');
+                $('#filterAksi').val('');
+                $('#filterBulan').val('');
+                $('#filterTahun').val('');
+                table.ajax.reload();
             });
         });
     </script>
@@ -69,25 +82,94 @@
 
 @section('konten')
     <div class="mt-4">
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="filterPelaku">Filter Berdasarkan Pelaku</label>
-                        <select class="form-control" id="filterPelaku">
+        <!-- Filter Card -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                <div>
+                    <h6 class="mb-0 font-weight-bold text-dark">
+                        <i class="fa fa-filter mr-1 text-primary"></i> Filter Log Aktivitas
+                    </h6>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <a href="{{ route('activity-log.ringkasan') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fa fa-chart-line mr-1"></i> Buka Ringkasan Aktivitas
+                    </a>
+                </div>
+            </div>
+            <div class="card-body bg-light py-3">
+                <div class="form-row">
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                        <label for="filterPelaku" class="small font-weight-bold text-muted mb-1">Pelaku (Pengguna)</label>
+                        <select class="form-control form-control-sm custom-select" id="filterPelaku">
                             <option value="">Semua Pelaku</option>
-                            <option value="sistem">Sistem (Aksi Latar Belakang)</option>
+                            <option value="sistem" {{ $filterUserId === 'sistem' ? 'selected' : '' }}>Sistem (Aksi Latar Belakang)</option>
                             @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->username }})</option>
+                                <option value="{{ $user->id }}" {{ (string)$filterUserId === (string)$user->id ? 'selected' : '' }}>
+                                    {{ $user->name }} ({{ $user->username }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                        <label for="filterKategori" class="small font-weight-bold text-muted mb-1">Kategori / Modul</label>
+                        <select class="form-control form-control-sm custom-select" id="filterKategori">
+                            <option value="">Semua Kategori</option>
+                            <option value="incoming" {{ $filterSubjectType === 'incoming' ? 'selected' : '' }}>Surat Masuk</option>
+                            <option value="outcoming" {{ $filterSubjectType === 'outcoming' ? 'selected' : '' }}>Surat Keluar</option>
+                            <option value="digital" {{ $filterSubjectType === 'digital' ? 'selected' : '' }}>Surat Digital</option>
+                            <option value="filelist" {{ $filterSubjectType === 'filelist' ? 'selected' : '' }}>Berkas</option>
+                            <option value="classification" {{ $filterSubjectType === 'classification' ? 'selected' : '' }}>Klasifikasi</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                        <label for="filterAksi" class="small font-weight-bold text-muted mb-1">Aksi / Event</label>
+                        <select class="form-control form-control-sm custom-select" id="filterAksi">
+                            <option value="">Semua Aksi</option>
+                            <option value="created" {{ $filterEvent === 'created' ? 'selected' : '' }}>Data Dibuat (Tambah)</option>
+                            <option value="updated" {{ $filterEvent === 'updated' ? 'selected' : '' }}>Data Diubah</option>
+                            <option value="deleted" {{ $filterEvent === 'deleted' ? 'selected' : '' }}>Data Dihapus</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 col-sm-6 mb-2">
+                        <label for="filterBulan" class="small font-weight-bold text-muted mb-1">Bulan</label>
+                        <select class="form-control form-control-sm custom-select" id="filterBulan">
+                            <option value="">Semua Bulan</option>
+                            @foreach($daftarBulan as $num => $name)
+                                <option value="{{ $num }}" {{ (string)$filterBulan === (string)$num ? 'selected' : '' }}>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 col-sm-6 mb-2">
+                        <label for="filterTahun" class="small font-weight-bold text-muted mb-1">Tahun</label>
+                        <select class="form-control form-control-sm custom-select" id="filterTahun">
+                            <option value="">Semua Tahun</option>
+                            @foreach($daftarTahun as $th)
+                                <option value="{{ $th }}" {{ (string)$filterTahun === (string)$th ? 'selected' : '' }}>{{ $th }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
+
+                <div class="mt-1 d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">
+                        @if($filterSubjectType || $filterEvent || $filterTahun || $filterBulan || $filterUserId)
+                            <i class="fa fa-info-circle text-primary mr-1"></i> Filter aktif dari Ringkasan Aktivitas diterapkan.
+                        @endif
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnResetFilter">
+                        <i class="fa fa-undo mr-1"></i> Reset Filter
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Daftar Log Aktivitas Sistem</h5>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 font-weight-bold text-dark">Daftar Log Aktivitas Sistem</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

@@ -4,11 +4,23 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam berkas ini.
 
 Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-08-27
+
+### Added
+
+- Menambahkan menu dan halaman **Ringkasan Aktivitas** (`/aktivitas/ringkasan`) untuk menyajikan data statistik manipulasi naskah dan arsip (_Data Ditambahkan_, _Data Diubah_, _Data Dihapus_, dan _Total Aksi Data_) dengan dukungan filter periode per Bulan, Tahun, dan Pelaku/Pengguna.
+- Menambahkan fitur **Drill-down Filter Terpadu**: seluruh kartu metrik statistik, nama kategori data (_Surat Masuk, Surat Keluar, Surat Digital, Berkas, Klasifikasi_), badge jumlah aksi (_Tambah/Ubah/Hapus_), dan angka kontribusi per pengguna dapat diklik langsung untuk mengarahkan ke halaman **Log Aktivitas** yang telah terfilter otomatis sesuai parameter terkait.
+- Menambahkan form filter interaktif komprehensif pada halaman **Log Aktivitas** (`/log-aktivitas`) yang mendukung penyaringan langsung berdasarkan Pelaku, Kategori/Modul Data, Aksi/Event, Bulan, dan Tahun, lengkap dengan tombol reset filter serta indikator filter aktif.
+
+### Changed
+
+- Mengubah navigasi sidebar dari menu tunggal **Log Aktivitas** menjadi menu induk dropdown **Aktivitas** yang menaungi submenu **Ringkasan Aktivitas** dan **Log Aktivitas**.
+
 ## [0.10.6] - 2026-08-27
 
 ### Fixed
 
-- Memperbaiki bug menu aksi (*three-dots dropdown menu*) pada tabel DataTables (Daftar Surat Masuk, Daftar Surat Keluar, Daftar Surat Digital, Daftar Berkas, Daftar Klasifikasi, dll.) yang terpotong (*clipped*) atau berukuran sangat kecil ketika hasil pencarian/filter hanya menampilkan satu atau sedikit baris data, dengan menetapkan tinggi minimum pada kontainer tabel (`.dataTables_scrollBody` dan `.table-responsive`) serta memastikan `z-index` menu dropdown berada di atas elemen lainnya.
+- Memperbaiki bug menu aksi (_three-dots dropdown menu_) pada tabel DataTables (Daftar Surat Masuk, Daftar Surat Keluar, Daftar Surat Digital, Daftar Berkas, Daftar Klasifikasi, dll.) yang terpotong (_clipped_) atau berukuran sangat kecil ketika hasil pencarian/filter hanya menampilkan satu atau sedikit baris data, dengan menetapkan tinggi minimum pada kontainer tabel (`.dataTables_scrollBody` dan `.table-responsive`) serta memastikan `z-index` menu dropdown berada di atas elemen lainnya.
 
 ## [0.10.5] - 2026-08-20
 
@@ -18,13 +30,13 @@ Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ### Removed
 
-- Menghapus komponen *Floating Action Button* (`components/floating-actions.blade.php`), gaya CSS terkait (`.floating-actions`, `.floating-action-*`) pada berkas tema (`apsm-theme.css` & `apsm-theme.min.css`), serta seluruh penggunaannya di aplikasi sehingga tampilan seluruh halaman kini bersih, terpadu, dan bebas dari tombol melayang.
+- Menghapus komponen _Floating Action Button_ (`components/floating-actions.blade.php`), gaya CSS terkait (`.floating-actions`, `.floating-action-*`) pada berkas tema (`apsm-theme.css` & `apsm-theme.min.css`), serta seluruh penggunaannya di aplikasi sehingga tampilan seluruh halaman kini bersih, terpadu, dan bebas dari tombol melayang.
 
 ## [0.10.4] - 2026-08-20
 
 ### Changed
 
-- Mengelompokkan pilihan berkas pada dropdown Select2 **Pemberkasan** di form tambah dan edit naskah (Surat Masuk & Surat Keluar) serta modal aksi cepat **Berkaskan Surat** (*Direct Filing Modal*) berdasarkan kategori **Kode & Keterangan Klasifikasi** menggunakan `<optgroup>`, serta menambahkan pencarian cerdas kustom (*custom optgroup matcher*) sehingga pencarian kode klasifikasi (seperti `HM.02.00`) langsung menampilkan seluruh berkas aktif di bawah grup tersebut untuk dipilih secara instan.
+- Mengelompokkan pilihan berkas pada dropdown Select2 **Pemberkasan** di form tambah dan edit naskah (Surat Masuk & Surat Keluar) serta modal aksi cepat **Berkaskan Surat** (_Direct Filing Modal_) berdasarkan kategori **Kode & Keterangan Klasifikasi** menggunakan `<optgroup>`, serta menambahkan pencarian cerdas kustom (_custom optgroup matcher_) sehingga pencarian kode klasifikasi (seperti `HM.02.00`) langsung menampilkan seluruh berkas aktif di bawah grup tersebut untuk dipilih secara instan.
 - Memperbarui format tampilan opsi dropdown Select2 **Kode Klasifikasi** pada form **Tambah/Edit Berkas** dan modal **Filter Berkas** menjadi format yang informatif `[Kode] Penjelasan/Keterangan` (contoh: `[TU.01] Tata Usaha`).
 
 ## [0.10.3] - 2026-08-20
@@ -32,27 +44,27 @@ Format changelog mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.
 ### Changed
 
 - Memindahkan tombol aksi (**Tambah Data**, **Filter Data**, dan **Export**) pada seluruh halaman master (**Daftar Surat Masuk**, **Daftar Surat Keluar**, **Daftar Surat Digital**, **Daftar Berkas**, dan **Daftar Klasifikasi**) dari floating action button (FAB) melayang ke bagian kanan Card Header dengan tata letak responsif untuk desktop dan perangkat seluler.
-- Mengubah kolom aksi pada tabel **Daftar Klasifikasi** menjadi tombol dropdown menu titik tiga (*three-dots action menu*) yang seragam dengan menu lainnya.
+- Mengubah kolom aksi pada tabel **Daftar Klasifikasi** menjadi tombol dropdown menu titik tiga (_three-dots action menu_) yang seragam dengan menu lainnya.
 
 ## [0.10.2] - 2026-08-20
 
 ### Changed
 
-- Mengubah kolom aksi pada tabel Daftar Surat Masuk, Daftar Surat Keluar, dan Daftar Surat Digital menjadi tombol dropdown menu titik tiga (*three-dots action menu*) dengan daftar opsi tindakan lengkap beserta ikonnya (Lihat Detail, Lihat Berkas PDF, Berkaskan Surat, Edit, dan Hapus).
+- Mengubah kolom aksi pada tabel Daftar Surat Masuk, Daftar Surat Keluar, dan Daftar Surat Digital menjadi tombol dropdown menu titik tiga (_three-dots action menu_) dengan daftar opsi tindakan lengkap beserta ikonnya (Lihat Detail, Lihat Berkas PDF, Berkaskan Surat, Edit, dan Hapus).
 - Menambahkan perilaku buka di tab baru (`target="_blank"`) pada opsi **Lihat Detail** naskah di tabel Surat Masuk, Surat Keluar, Surat Digital, dan Surat Belum Diberkaskan agar halaman daftar yang sedang aktif tidak tertutup.
-- Menggabungkan kolom **Aksi** dan kolom **Status** pada tabel **Daftar Berkas** ke dalam satu tombol menu titik tiga (*three-dots dropdown*), dengan pemisahan seksi yang jelas antara opsi aksi berkas (Buka Berkas, Hapus Berkas) dan opsi alur perubahan status berkas (Usul Pindah UP ke UK, Aktif, Inaktif, Usul Musnah, Usul Permanen, Musnah, Permanen) yang tetap terintegrasi dengan verifikasi MFA.
+- Menggabungkan kolom **Aksi** dan kolom **Status** pada tabel **Daftar Berkas** ke dalam satu tombol menu titik tiga (_three-dots dropdown_), dengan pemisahan seksi yang jelas antara opsi aksi berkas (Buka Berkas, Hapus Berkas) dan opsi alur perubahan status berkas (Usul Pindah UP ke UK, Aktif, Inaktif, Usul Musnah, Usul Permanen, Musnah, Permanen) yang tetap terintegrasi dengan verifikasi MFA.
 
 ## [0.10.1] - 2026-08-20
 
 ### Changed
 
 - Memperbarui dan merapikan tampilan notifikasi pembuatan Personal Access Token pada halaman pengelolaan Token API dengan tata letak yang lebih terstruktur, kartu peringatan yang lebih jelas, ikon penanda, serta petunjuk format header otorisasi.
-- Memperbarui dan merapikan tabel daftar Token Aktif dengan header terstruktur, badge jumlah token, identitas ID token, visualisasi status masa berlaku/kedaluwarsa, badge kemampuan, tombol aksi cabut yang modern, dan tampilan state kosong (*empty state*) yang informatif.
+- Memperbarui dan merapikan tabel daftar Token Aktif dengan header terstruktur, badge jumlah token, identitas ID token, visualisasi status masa berlaku/kedaluwarsa, badge kemampuan, tombol aksi cabut yang modern, dan tampilan state kosong (_empty state_) yang informatif.
 - Memperbarui interaksi JavaScript penyalinan token (`api-tokens.min.js`) agar memberikan umpan balik visual langsung (transisi warna tombol, ikon centang, dan teks "Tersalin!") saat tombol salin ditekan.
 
 ### Fixed
 
-- Memperbaiki posisi badge status "Hanya Ditampilkan Sekali" pada notifikasi pembuatan token agar berdampingan rapi dengan judul dan tidak bertabrakan dengan tombol tutup (*dismiss button*) pada berbagai resolusi layar.
+- Memperbaiki posisi badge status "Hanya Ditampilkan Sekali" pada notifikasi pembuatan token agar berdampingan rapi dengan judul dan tidak bertabrakan dengan tombol tutup (_dismiss button_) pada berbagai resolusi layar.
 
 ## [0.10.0] - 2026-08-11
 

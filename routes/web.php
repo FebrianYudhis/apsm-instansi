@@ -41,6 +41,7 @@ Route::middleware(['auth', EnsureActiveYear::class])->group(function () {
             'nama' => '[A-Za-z0-9-]+\.pdf',
         ]);
 
+    Route::get('aktivitas/ringkasan', [ActivityLogController::class, 'ringkasan'])->name('activity-log.ringkasan');
     Route::get('log-aktivitas', [ActivityLogController::class, 'index'])->name('activity-log');
 
     Route::get('profil', [ProfileController::class, 'edit'])->name('profil.edit');
